@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/graphrag-visualizer/static/js/main.43d7bdce.js",
+    "main.js": "/graphrag-visualizer/static/js/main.90f22f57.js",
     "static/js/736.4f33b0ff.chunk.js": "/graphrag-visualizer/static/js/736.4f33b0ff.chunk.js",
     "static/js/453.318c7ab1.chunk.js": "/graphrag-visualizer/static/js/453.318c7ab1.chunk.js",
     "index.html": "/graphrag-visualizer/index.html",
-    "main.43d7bdce.js.map": "/graphrag-visualizer/static/js/main.43d7bdce.js.map",
+    "main.90f22f57.js.map": "/graphrag-visualizer/static/js/main.90f22f57.js.map",
     "453.318c7ab1.chunk.js.map": "/graphrag-visualizer/static/js/453.318c7ab1.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.43d7bdce.js"
+    "static/js/main.90f22f57.js"
   ]
 }
