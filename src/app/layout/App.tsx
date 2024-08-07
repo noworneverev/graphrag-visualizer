@@ -59,11 +59,16 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    ReactGA.initialize("G-0TD0FXFZDE");
-    ReactGA.send({
-      hitType: "pageview",
-      page: window.location.pathname + window.location.search,
-    });
+    const measurementId = process.env.REACT_APP_GA_MEASUREMENT_ID;
+    if (measurementId) {
+      ReactGA.initialize(measurementId);
+      ReactGA.send({
+        hitType: "pageview",
+        page: window.location.pathname + window.location.search,
+      });
+    } else {
+      console.error("Google Analytics measurement ID not found");
+    }
   }, []);
 
   return (

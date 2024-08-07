@@ -64,7 +64,12 @@ const GraphDataHandler: React.FC = () => {
   }, [entities]);
 
   useEffect(() => {
-    ReactGA.initialize("G-0TD0FXFZDE");
+    const measurementId = process.env.REACT_APP_GA_MEASUREMENT_ID;
+    if (measurementId) {
+      ReactGA.initialize(measurementId);
+    } else {
+      console.error("Google Analytics measurement ID not found");
+    }
   }, []);
 
   const onDrop = (acceptedFiles: File[]) => {
