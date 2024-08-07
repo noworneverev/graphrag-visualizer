@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "GraphRAG Viz",
+  "name": "GraphRAG Visualizer",
+  "description": "Visualize Microsoft GraphRAG artifacts by uploading parquet files.",
   "icons": [
     {
       "src": "favicon.ico",
