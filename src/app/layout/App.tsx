@@ -1,0 +1,108 @@
+import React, { useEffect, useState } from "react";
+
+import GraphDataHandler from "../components/GraphDataHandler";
+import {
+  CssBaseline,
+  Container,
+  Box,
+  createTheme,
+  darkScrollbar,
+  ThemeProvider,
+  IconButton,
+  Tooltip,
+  Button,
+  Link,
+} from "@mui/material";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import GitHubIcon from "@mui/icons-material/GitHub";
+
+const App: React.FC = () => {
+  const [darkMode, setDarkMode] = useState(true);
+  const paletteType = darkMode ? "dark" : "light";
+
+  const theme = createTheme({
+    palette: {
+      mode: paletteType,
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: paletteType === "dark" ? darkScrollbar() : null,
+        },
+      },
+      MuiPopover: {
+        styleOverrides: {
+          root: {
+            zIndex: 1600,
+          },
+        },
+      },
+      MuiModal: {
+        styleOverrides: {
+          root: {
+            zIndex: 1600,
+          },
+        },
+      },
+    },
+  });
+
+  function handleThemeChange() {
+    setDarkMode(!darkMode);
+    localStorage.setItem("theme", darkMode ? "light" : "dark");
+  }
+
+  useEffect(() => {
+    const currentTheme = localStorage.getItem("theme");
+    setDarkMode(currentTheme === "dark");
+  }, []);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Box sx={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+        <Container disableGutters maxWidth={false}>
+          <CssBaseline />
+
+          <Box
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              zIndex: 1000,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <IconButton
+              component={Link}
+              href="https://github.com/noworneverev/graphrag-visualizer"
+              target="_blank"
+              rel="noopener"
+              color="inherit"
+            >
+              <GitHubIcon />
+            </IconButton>
+            {darkMode ? (
+              <Tooltip title="Turn on the light">
+                <IconButton onClick={handleThemeChange} color="inherit">
+                  <DarkModeOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Turn off the light">
+                <IconButton onClick={handleThemeChange} color="inherit">
+                  <LightModeOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+          <GraphDataHandler />
+        </Container>
+      </Box>
+    </ThemeProvider>
+  );
+};
+
+export default App;
