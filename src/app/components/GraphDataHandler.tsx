@@ -7,6 +7,7 @@ import Introduction from "./Introduction";
 import useFileHandler from "../hooks/useFileHandler";
 import useGraphData from "../hooks/useGraphData";
 import DataTableContainer from "./DataTableContainer";
+import ReactGA from "react-ga4";
 
 const GraphDataHandler: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -62,6 +63,10 @@ const GraphDataHandler: React.FC = () => {
     }
   }, [entities]);
 
+  useEffect(() => {
+    ReactGA.initialize("G-0TD0FXFZDE");
+  }, []);
+
   const onDrop = (acceptedFiles: File[]) => {
     handleFilesRead(acceptedFiles);
   };
@@ -77,6 +82,12 @@ const GraphDataHandler: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
+    ReactGA.send({
+      hitType: "event",
+      eventCategory: "Tabs",
+      eventAction: "click",
+      eventLabel: `Tab ${newValue}`,
+    });
   };
 
   const toggleGraphType = () => {

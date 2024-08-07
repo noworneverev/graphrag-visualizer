@@ -100,10 +100,6 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({
       });
     }
 
-    // if (types.length > 1) {
-
-    // }
-
     entityColumns.forEach((tc) => {
       if (tc.accessorKey) {
         validAccessorKeys.add(tc.accessorKey);

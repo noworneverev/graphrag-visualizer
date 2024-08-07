@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactGA from "react-ga4";
 
 import GraphDataHandler from "../components/GraphDataHandler";
 import {
@@ -10,7 +11,6 @@ import {
   ThemeProvider,
   IconButton,
   Tooltip,
-  Button,
   Link,
 } from "@mui/material";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -56,6 +56,14 @@ const App: React.FC = () => {
   useEffect(() => {
     const currentTheme = localStorage.getItem("theme");
     setDarkMode(currentTheme === "dark");
+  }, []);
+
+  useEffect(() => {
+    ReactGA.initialize("G-0TD0FXFZDE");
+    ReactGA.send({
+      hitType: "pageview",
+      page: window.location.pathname + window.location.search,
+    });
   }, []);
 
   return (

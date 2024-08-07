@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   MRT_ColumnDef,
 } from "material-react-table";
-import { Box, createTheme, ThemeProvider } from "@mui/material";
+import { Box } from "@mui/material";
 
 interface DataTableProps<T extends object> {
   data: T[];

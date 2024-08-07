@@ -49,6 +49,13 @@ const Introduction: React.FC = () => {
             allowing users to focus on specific nodes or relationships.
           </Typography>
         </li>
+        <li>
+          <Typography variant="body1">
+            <strong>Local Processing:</strong> Your artifacts are processed
+            locally on your machine. They are not uploaded anywhere, ensuring
+            your data remains secure and private.
+          </Typography>
+        </li>
       </ul>
 
       <Typography variant="h6" gutterBottom>
