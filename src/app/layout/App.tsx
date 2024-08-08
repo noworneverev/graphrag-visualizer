@@ -84,8 +84,10 @@ const App: React.FC = () => {
               right: 12,
               zIndex: 1000,
               display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
               alignItems: "center",
               gap: 1,
+              padding: { xs: "20px 0px", sm: "0" },
             }}
           >
             <IconButton

@@ -117,7 +117,7 @@ const GraphDataHandler: React.FC = () => {
             mt: 3,
             display: "flex",
             flexDirection: "column",
-            height: "calc(100vh - 64px)",
+            height: { md: "calc(100vh - 64px)", xs: "auto" },
           }}
         >
           <Introduction />
