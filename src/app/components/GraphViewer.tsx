@@ -489,6 +489,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             control={
               <Checkbox
                 checked={includeTextUnits}
+                // onChange={() => onIncludeTextUnitsChange(!includeTextUnits)}
                 onChange={() => {
                   if (!includeTextUnits) {
                     onIncludeTextUnitsChange(true);
@@ -514,29 +515,26 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             }
             label="Include Communities"
           />
-          <Tooltip
-            title={
-              !includeTextUnits
-                ? "You should tick 'Include Text Units' first"
-                : ""
-            }
-            placement="top"
-          >
-            <span>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={includeCovariates}
-                    onChange={() =>
-                      onIncludeCovariatesChange(!includeCovariates)
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={includeCovariates}
+                onChange={() => {
+                  if (!includeCovariates) {
+                    if (!includeTextUnits) {
+                      onIncludeTextUnitsChange(true);
                     }
-                    disabled={!hasCovariates || !includeTextUnits}
-                  />
-                }
-                label="Include Covariates"
+                    onIncludeCovariatesChange(true);
+                  } else {
+                    onIncludeCovariatesChange(false);
+                  }
+                }}
+                disabled={!hasCovariates}
               />
-            </span>
-          </Tooltip>
+            }
+            label="Include Covariates"
+          />
         </FormGroup>
       </Box>
 
