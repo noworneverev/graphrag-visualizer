@@ -34,9 +34,12 @@ const useGraphData = (
       graph_embedding: entity.graph_embedding,
       text_unit_ids: entity.text_unit_ids,
       description_embedding: entity.description_embedding,
+      neighbors: [],
+      links: [],
     }));
 
-    const nodeIds = new Set(nodes.map((node) => node.id));
+    const nodesMap: { [key: string]: CustomNode } = {};
+    nodes.forEach(node => nodesMap[node.id] = node);
 
     const links: CustomLink[] = relationships
       .map((relationship) => ({
@@ -52,7 +55,9 @@ const useGraphData = (
         target_degree: relationship.target_degree,
         rank: relationship.rank,
       }))
-      .filter((link) => nodeIds.has(link.source) && nodeIds.has(link.target));
+      .filter((link) => nodesMap[link.source] && nodesMap[link.target]);
+
+    
 
     if (includeDocuments) {
       const documentNodes = documents.map((document) => ({
@@ -63,8 +68,11 @@ const useGraphData = (
         type: "RAW_DOCUMENT", // avoid conflict with "DOCUMENT" type
         raw_content: document.raw_content,
         text_unit_ids: document.text_unit_ids,
+        neighbors: [],
+        links: [],
       }));
-
+      
+      documentNodes.forEach(node => nodesMap[node.id] = node);
       nodes.push(...documentNodes);
 
       if (includeTextUnits) {
@@ -94,8 +102,11 @@ const useGraphData = (
         document_ids: textunit.document_ids,
         entity_ids: textunit.entity_ids,
         relationship_ids: textunit.relationship_ids,
+        neighbors: [],
+        links: [],
       }));
-
+      
+      textUnitNodes.forEach(node => nodesMap[node.id] = node);
       nodes.push(...textUnitNodes);
 
       const textUnitEntityLinks = textunits
@@ -131,9 +142,12 @@ const useGraphData = (
           rank_explanation: report?.rank_explanation || "",
           summary: report?.summary || "",
           findings: report?.findings || [],
+          neighbors: [],
+          links: [],
         };
       });
 
+      communityNodes.forEach(node => nodesMap[node.id] = node);
       nodes.push(...communityNodes);
 
       const uniqueLinks = new Set<string>();
@@ -186,8 +200,11 @@ const useGraphData = (
               type: "FINDING",
               explanation: finding.explanation,
               summary: finding.summary,
+              neighbors: [],
+              links: [],
             };
 
+            nodesMap[findingNode.id] = findingNode;
             nodes.push(findingNode);
 
             const findingLink = {
@@ -223,8 +240,11 @@ const useGraphData = (
         text_unit_id: covariate.text_unit_id,
         document_ids: covariate.document_ids,
         n_tokens: covariate.n_tokens,
+        neighbors: [],
+        links: [],
       }));
 
+      covariateNodes.forEach(node => nodesMap[node.id] = node);
       nodes.push(...covariateNodes);
 
       const covariateTextUnitLinks = covariates.map((covariate) => ({
@@ -236,6 +256,22 @@ const useGraphData = (
 
       links.push(...covariateTextUnitLinks);
     }
+
+    links.forEach(link => {
+      const sourceNode = nodesMap[link.source];
+      const targetNode = nodesMap[link.target];
+      if (sourceNode && targetNode) {
+        if (!sourceNode.neighbors!.includes(targetNode))
+          sourceNode.neighbors!.push(targetNode);
+        if (!targetNode.neighbors!.includes(sourceNode))
+          targetNode.neighbors!.push(sourceNode);
+        if (!sourceNode.links!.includes(link))
+          sourceNode.links!.push(link);
+        if (!targetNode.links!.includes(link))
+          targetNode.links!.push(link);
+      }
+    });
+
 
     if (nodes.length > 0) {
       setGraphData({ nodes, links });

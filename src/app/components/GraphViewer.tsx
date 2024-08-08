@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import ForceGraph2D from "react-force-graph-2d";
 import ForceGraph3D from "react-force-graph-3d";
 import {
@@ -81,7 +81,6 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   );
   const [hoverNode, setHoverNode] = useState<CustomNode | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  // const [searchResults, setSearchResults] = useState<CustomNode[]>([]);
   const [searchResults, setSearchResults] = useState<
     (CustomNode | CustomLink)[]
   >([]);
@@ -115,29 +114,6 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     ],
     threshold: 0.3,
   });
-
-  useEffect(() => {
-    const nodesMap: { [key: string]: CustomNode } = {};
-
-    data.nodes.forEach((node) => {
-      if (!node.neighbors) node.neighbors = [];
-      if (!node.links) node.links = [];
-      nodesMap[node.id] = node;
-    });
-
-    data.links.forEach((link) => {
-      const sourceNode = nodesMap[link.source];
-      const targetNode = nodesMap[link.target];
-      if (sourceNode && targetNode) {
-        if (!sourceNode.neighbors!.includes(targetNode))
-          sourceNode.neighbors!.push(targetNode);
-        if (!targetNode.neighbors!.includes(sourceNode))
-          targetNode.neighbors!.push(sourceNode);
-        if (!sourceNode.links!.includes(link)) sourceNode.links!.push(link);
-        if (!targetNode.links!.includes(link)) targetNode.links!.push(link);
-      }
-    });
-  }, [data]);
 
   const handleNodeHover = useCallback((node: CustomNode | null) => {
     const newHighlightNodes = new Set<CustomNode>();
