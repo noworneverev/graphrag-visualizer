@@ -28,7 +28,7 @@ const DropZone: React.FC<DropZoneProps> = ({
           ? theme.palette.action.hover
           : theme.palette.background.default,
         color: theme.palette.text.primary,
-        height: "100%",
+        height: "150px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

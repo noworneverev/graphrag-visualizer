@@ -117,11 +117,10 @@ const GraphDataHandler: React.FC = () => {
             mt: 3,
             display: "flex",
             flexDirection: "column",
-            height: { md: "calc(100vh - 64px)", xs: "auto" },
           }}
         >
-          <Introduction />
           <DropZone {...{ getRootProps, getInputProps, isDragActive }} />
+          <Introduction />
         </Container>
       )}
       {tabIndex === 1 && (

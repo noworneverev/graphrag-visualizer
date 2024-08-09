@@ -73,49 +73,47 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
-        <Container disableGutters maxWidth={false}>
-          <CssBaseline />
+      <Container disableGutters maxWidth={false}>
+        <CssBaseline />
 
-          <Box
-            sx={{
-              position: "absolute",
-              top: 12,
-              right: 12,
-              zIndex: 1000,
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: "center",
-              gap: 1,
-              padding: { xs: "20px 0px", sm: "0" },
-            }}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            zIndex: 1000,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
+            gap: 1,
+            padding: { xs: "20px 0px", sm: "0" },
+          }}
+        >
+          <IconButton
+            component={Link}
+            href="https://github.com/noworneverev/graphrag-visualizer"
+            target="_blank"
+            rel="noopener"
+            color="inherit"
           >
-            <IconButton
-              component={Link}
-              href="https://github.com/noworneverev/graphrag-visualizer"
-              target="_blank"
-              rel="noopener"
-              color="inherit"
-            >
-              <GitHubIcon />
-            </IconButton>
-            {darkMode ? (
-              <Tooltip title="Turn on the light">
-                <IconButton onClick={handleThemeChange} color="inherit">
-                  <DarkModeOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Turn off the light">
-                <IconButton onClick={handleThemeChange} color="inherit">
-                  <LightModeOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-          <GraphDataHandler />
-        </Container>
-      </Box>
+            <GitHubIcon />
+          </IconButton>
+          {darkMode ? (
+            <Tooltip title="Turn on the light">
+              <IconButton onClick={handleThemeChange} color="inherit">
+                <DarkModeOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Turn off the light">
+              <IconButton onClick={handleThemeChange} color="inherit">
+                <LightModeOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+        <GraphDataHandler />
+      </Container>
     </ThemeProvider>
   );
 };
