@@ -108,8 +108,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   const [apiSearchResults, setApiSearchResults] = useState<SearchResult | null>(
     null
   );
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+
   const [graphData, setGraphData] = useState<CustomGraphData>(data);
 
   const initialGraphData = useRef<CustomGraphData>(data);
@@ -127,8 +126,6 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     query: string,
     searchType: "local" | "global"
   ) => {
-    setLoading(true);
-    setError(null);
     try {
       const data: SearchResult =
         searchType === "local"
@@ -140,9 +137,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       updateGraphData(data.context_data);
     } catch (err) {
       console.error("An error occurred during the API search.", err);
-      setError("An error occurred during the API search.");
     } finally {
-      setLoading(false);
     }
   };
 
