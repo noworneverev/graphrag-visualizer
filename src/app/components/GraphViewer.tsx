@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import ForceGraph2D from "react-force-graph-2d";
 import ForceGraph3D from "react-force-graph-3d";
 import {
@@ -21,6 +21,7 @@ import {
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import SearchIcon from "@mui/icons-material/Search";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Fuse from "fuse.js";
 import {
   CSS2DRenderer,
@@ -30,6 +31,9 @@ import * as THREE from "three";
 import { Renderer } from "three";
 import SearchDrawer from "./SearchDrawer";
 import DetailDrawer from "./DetailDrawer";
+import { SearchResult } from "../models/search-result";
+import agent from "../api/agent";
+import APISearchDrawer from "./APISearchDrawer";
 
 interface GraphViewerProps {
   data: CustomGraphData;
@@ -99,6 +103,115 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   const extraRenderers = [new CSS2DRenderer() as any as Renderer];
   const nodeCount = data.nodes.length;
   const linkCount = data.links.length;
+
+  const [apiDrawerOpen, setApiDrawerOpen] = useState(false);
+  const [apiSearchResults, setApiSearchResults] = useState<SearchResult | null>(
+    null
+  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [graphData, setGraphData] = useState<CustomGraphData>(data);
+
+  const initialGraphData = useRef<CustomGraphData>(data);
+
+  useEffect(() => {
+    setGraphData(data);
+    initialGraphData.current = data;
+  }, [data]);
+
+  const toggleApiDrawer = (open: boolean) => () => {
+    setApiDrawerOpen(open);
+  };
+
+  const handleApiSearch = async (
+    query: string,
+    searchType: "local" | "global"
+  ) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data: SearchResult =
+        searchType === "local"
+          ? await agent.Search.local(query)
+          : await agent.Search.global(query);
+
+      setApiSearchResults(data);
+      // Process the search result to update the graph data
+      updateGraphData(data.context_data);
+    } catch (err) {
+      console.error("An error occurred during the API search.", err);
+      setError("An error occurred during the API search.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateGraphData = (contextData: any) => {
+    if (!contextData) return;
+
+    const newNodes: CustomNode[] = [];
+    const newLinks: CustomLink[] = [];
+
+    const baseGraphData = initialGraphData.current;
+
+    // Assuming contextData has keys like entities, reports, relationships, sources
+    Object.entries(contextData).forEach(([key, items]) => {
+      if (Array.isArray(items)) {
+        items.forEach((item) => {
+          if (key === "relationships") {
+            // Handle links
+            const existingLink = baseGraphData.links.find(
+              (link) =>
+                link.human_readable_id?.toString() === item.id.toString()
+            );
+
+            if (existingLink) {
+              newLinks.push(existingLink);
+            }
+          } else if (key === "entities") {
+            const existingNode = baseGraphData.nodes.find(
+              (node) =>
+                node.human_readable_id?.toString() === item.id.toString()
+            );
+            if (existingNode) {
+              newNodes.push(existingNode);
+            }
+          } else if (key === "reports") {
+            const existingNode = baseGraphData.nodes.find(
+              (node) => node.uuid === item.id.toString()
+            );
+            if (existingNode) {
+              newNodes.push(existingNode);
+            }
+          } else if (key === "sources") {
+            const existingNode = baseGraphData.nodes.find(
+              (node) => node.text?.toString() === item.text
+            );
+            if (existingNode) {
+              newNodes.push(existingNode);
+            }
+          } else if (key === "covariates" || key === "claims") {
+            const existingNode = baseGraphData.nodes.find(
+              (node) =>
+                node.human_readable_id?.toString() === item.id.toString()
+            );
+            if (existingNode) {
+              newNodes.push(existingNode);
+            }
+          }
+        });
+      }
+    });
+
+    // Update the graph data with the new nodes and links
+    const updatedGraphData: CustomGraphData = {
+      nodes: [...newNodes],
+      links: [...newLinks],
+    };
+
+    // Set the updated data to trigger re-render
+    setGraphData(updatedGraphData);
+  };
 
   const fuse = new Fuse([...data.nodes, ...data.links], {
     keys: [
@@ -370,15 +483,29 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       return new THREE.Object3D();
     }
 
-    const nodeEl = document.createElement("div");
-    nodeEl.textContent = node.name || node.id; // Use either name or id for the label
-    nodeEl.style.color = node.color;
-    nodeEl.style.padding = "2px 4px";
-    nodeEl.style.borderRadius = "4px";
-    nodeEl.style.fontSize = "10px";
-    nodeEl.className = "node-label";
+    try {
+      const nodeEl = document.createElement("div");
+      nodeEl.textContent = node.name || node.id; // Use either name or id for the label
+      nodeEl.style.color = node.color;
+      nodeEl.style.padding = "2px 4px";
+      nodeEl.style.borderRadius = "4px";
+      nodeEl.style.fontSize = "10px";
+      nodeEl.className = "node-label";
 
-    return new CSS2DObject(nodeEl);
+      return new CSS2DObject(nodeEl);
+    } catch (error) {
+      console.error("Error creating 3D object:", error);
+      return new THREE.Object3D(); // Fallback in case of error
+    }
+  };
+
+  const localSearchEnabled = hasCovariates
+    ? includeTextUnits && includeCommunities && includeCovariates
+    : includeTextUnits && includeCommunities;
+
+  const clearSearchResults = () => {
+    setGraphData(initialGraphData.current);
+    setApiSearchResults(null);
   };
 
   return (
@@ -414,7 +541,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             onClick={toggleDrawer(true)}
             startIcon={<SearchIcon />}
           >
-            Search
+            Search Nodes/Links
           </Button>
           <FormControlLabel
             control={
@@ -456,7 +583,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
               <Checkbox
                 checked={includeDocuments}
                 onChange={() => onIncludeDocumentsChange(!includeDocuments)}
-                disabled={!hasDocuments}
+                disabled={!hasDocuments || apiSearchResults !== null}
               />
             }
             label="Include Documents"
@@ -476,7 +603,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                     onIncludeCovariatesChange(false); // Uncheck Covariates when Text Units is unchecked
                   }
                 }}
-                disabled={!hasTextUnits}
+                disabled={!hasTextUnits || apiSearchResults !== null}
               />
             }
             label="Include Text Units"
@@ -486,7 +613,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
               <Checkbox
                 checked={includeCommunities}
                 onChange={() => onIncludeCommunitiesChange(!includeCommunities)}
-                disabled={!hasCommunities}
+                disabled={!hasCommunities || apiSearchResults !== null}
               />
             }
             label="Include Communities"
@@ -506,13 +633,23 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                     onIncludeCovariatesChange(false);
                   }
                 }}
-                disabled={!hasCovariates}
+                disabled={!hasCovariates || apiSearchResults !== null}
               />
             }
             label="Include Covariates"
           />
         </FormGroup>
       </Box>
+
+      <APISearchDrawer
+        apiDrawerOpen={apiDrawerOpen}
+        toggleDrawer={toggleApiDrawer}
+        handleApiSearch={handleApiSearch}
+        apiSearchResults={apiSearchResults}
+        localSearchEnabled={localSearchEnabled}
+        globalSearchEnabled={includeCommunities}
+        hasCovariates={hasCovariates}
+      />
 
       <SearchDrawer
         searchTerm={searchTerm}
@@ -539,7 +676,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       {graphType === "2d" ? (
         <ForceGraph2D
           ref={graphRef}
-          graphData={data}
+          graphData={graphData}
           nodeAutoColorBy="type"
           nodeRelSize={NODE_R}
           autoPauseRedraw={false}
@@ -579,7 +716,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
         <ForceGraph3D
           ref={graphRef}
           extraRenderers={extraRenderers}
-          graphData={data}
+          graphData={graphData}
           nodeAutoColorBy="type"
           nodeRelSize={NODE_R}
           linkWidth={(link) =>
@@ -608,10 +745,27 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
+          gap: 1,
         }}
       >
         <Typography variant="body2">Nodes: {nodeCount}</Typography>
         <Typography variant="body2">Relationships: {linkCount}</Typography>
+        <Button
+          variant="contained"
+          onClick={toggleApiDrawer(true)}
+          startIcon={<SearchIcon />}
+        >
+          Ask Query (Local/Global Search)
+        </Button>
+        <Button
+          variant="contained"
+          onClick={clearSearchResults}
+          startIcon={<DeleteIcon />}
+          color="warning"
+          disabled={apiSearchResults === null}
+        >
+          Clear Query Results
+        </Button>
       </Box>
     </Box>
   );
