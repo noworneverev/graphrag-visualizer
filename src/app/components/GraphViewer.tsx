@@ -108,6 +108,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   const [apiSearchResults, setApiSearchResults] = useState<SearchResult | null>(
     null
   );
+  const [serverUp, setServerUp] = useState<boolean>(false);
 
   const [graphData, setGraphData] = useState<CustomGraphData>(data);
 
@@ -117,6 +118,10 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     setGraphData(data);
     initialGraphData.current = data;
   }, [data]);
+
+  useEffect(() => {
+    checkServerStatus();
+  }, []);
 
   const toggleApiDrawer = (open: boolean) => () => {
     setApiDrawerOpen(open);
@@ -138,6 +143,19 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     } catch (err) {
       console.error("An error occurred during the API search.", err);
     } finally {
+    }
+  };
+
+  const checkServerStatus = async () => {
+    try {
+      const response = await agent.Status.check();
+      if (response.status === "Server is up and running") {
+        setServerUp(true);
+      } else {
+        setServerUp(false);
+      }
+    } catch (error) {
+      setServerUp(false);
     }
   };
 
@@ -644,6 +662,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
         localSearchEnabled={localSearchEnabled}
         globalSearchEnabled={includeCommunities}
         hasCovariates={hasCovariates}
+        serverUp={serverUp}
       />
 
       <SearchDrawer

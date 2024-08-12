@@ -18,6 +18,8 @@ import {
   Paper,
   IconButton,
   Collapse,
+  Link,
+  Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -35,6 +37,7 @@ interface APISearchDrawerProps {
   localSearchEnabled: boolean;
   globalSearchEnabled: boolean;
   hasCovariates: boolean;
+  serverUp: boolean;
 }
 
 const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
@@ -45,6 +48,7 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
   localSearchEnabled,
   globalSearchEnabled,
   hasCovariates,
+  serverUp,
 }) => {
   const [query, setQuery] = useState<string>("");
   const [loadingLocal, setLoadingLocal] = useState<boolean>(false);
@@ -128,7 +132,12 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
               variant="contained"
               sx={{ flex: 1, whiteSpace: "normal", textAlign: "center" }}
               onClick={() => handleSearch("local")}
-              disabled={!localSearchEnabled || loadingLocal || loadingGlobal}
+              disabled={
+                !serverUp ||
+                !localSearchEnabled ||
+                loadingLocal ||
+                loadingGlobal
+              }
             >
               {loadingLocal ? <CircularProgress size={24} /> : "Local Search"}
             </Button>
@@ -137,22 +146,42 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
               color="success"
               sx={{ flex: 1, whiteSpace: "normal", textAlign: "center" }}
               onClick={() => handleSearch("global")}
-              disabled={!globalSearchEnabled || loadingLocal || loadingGlobal}
+              disabled={
+                !serverUp ||
+                !globalSearchEnabled ||
+                loadingLocal ||
+                loadingGlobal
+              }
             >
               {loadingGlobal ? <CircularProgress size={24} /> : "Global Search"}
             </Button>
           </Box>
+
+          {!serverUp && (
+            <Alert severity="error" sx={{ mt: 1 }}>
+              Server is not running. Please start the server to use the API.
+              Follow the instructions at{" "}
+              <Link
+                href="https://github.com/noworneverev/graphrag-api"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                graphrag-api
+              </Link>
+              .
+            </Alert>
+          )}
           {!localSearchEnabled && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
+            <Alert severity="warning" sx={{ mt: 1 }}>
               Please enable "Include Text Unit" and "Include Communities"
               {hasCovariates && ', and "Include Covariates"'} to use Local
               Search.
-            </Typography>
+            </Alert>
           )}
           {!globalSearchEnabled && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
+            <Alert severity="warning" sx={{ mt: 1 }}>
               Please enable "Include Communities" to use Global Search.
-            </Typography>
+            </Alert>
           )}
         </Box>
 

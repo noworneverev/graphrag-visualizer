@@ -57,8 +57,13 @@ const Search = {
   local: (query: string) => requests.get('search/local', new URLSearchParams({ query })),
 };
 
+const Status = {
+  check: () => requests.get('status'),
+};
+
 const agent = {
   Search,
+  Status,
 };
 
 export default agent;
