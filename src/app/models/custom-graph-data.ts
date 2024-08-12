@@ -40,7 +40,7 @@ export interface CustomNode extends NodeObject {
     end_date?: string;
     source_text?: string;
     text_unit_id?: string;
-  
+    covariate_type?: string;
   }
   
 export interface CustomLink extends LinkObject {

@@ -184,7 +184,8 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           } else if (key === "entities") {
             const existingNode = baseGraphData.nodes.find(
               (node) =>
-                node.human_readable_id?.toString() === item.id.toString()
+                node.human_readable_id?.toString() === item.id.toString() &&
+                !node.covariate_type
             );
             if (existingNode) {
               newNodes.push(existingNode);
@@ -206,7 +207,8 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           } else if (key === "covariates" || key === "claims") {
             const existingNode = baseGraphData.nodes.find(
               (node) =>
-                node.human_readable_id?.toString() === item.id.toString()
+                node.human_readable_id?.toString() === item.id.toString() &&
+                node.covariate_type
             );
             if (existingNode) {
               newNodes.push(existingNode);

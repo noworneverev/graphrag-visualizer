@@ -177,6 +177,11 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({
               </Typography>
               <Typography>ID: {selectedNode.uuid}</Typography>
               <Typography>Name: {selectedNode.name}</Typography>
+              {selectedNode.covariate_type && (
+                <Typography>
+                  Covariate Type: {selectedNode.covariate_type}
+                </Typography>
+              )}
               <Typography>Type: {selectedNode.type}</Typography>
               {selectedNode.title && (
                 <Typography>Title: {selectedNode.title}</Typography>
@@ -192,6 +197,11 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({
 
               {selectedNode.description && (
                 <Typography>Description: {selectedNode.description}</Typography>
+              )}
+              {selectedNode.human_readable_id && (
+                <Typography>
+                  Human Readable ID: {selectedNode.human_readable_id}
+                </Typography>
               )}
 
               {/* {selectedNode.human_readable_id ||
