@@ -36,6 +36,13 @@ const Introduction: React.FC = () => {
         needing additional software like Gephi, Neo4j, or Jupyter Notebook.
       </Typography>
 
+      <Box
+        component="img"
+        src={process.env.PUBLIC_URL + "/demo.png"}
+        alt="Demo"
+        sx={{ mt: 2, mb: 2, width: "100%" }}
+      />
+
       <Typography variant="h6" gutterBottom>
         Features
       </Typography>
@@ -66,6 +73,31 @@ const Introduction: React.FC = () => {
           </Typography>
         </li>
       </ul>
+
+      <Typography variant="h6" gutterBottom>
+        Using the Search Functionality
+      </Typography>
+      <Typography variant="body1" gutterBottom>
+        Once the{" "}
+        <Link
+          href="https://github.com/noworneverev/graphrag-api"
+          target="_blank"
+          rel="noopener"
+        >
+          graphrag-api
+        </Link>{" "}
+        server is up and running, you can perform searches directly through the
+        GraphRAG Visualizer. This allows you to easily search and explore data
+        that is hosted on your local server.
+      </Typography>
+
+      <Box
+        component="img"
+        src={process.env.PUBLIC_URL + "/search.png"}
+        alt="Search"
+        sx={{ mt: 2, mb: 2, width: "100%" }}
+      />
+
       <Typography variant="h6" gutterBottom>
         Graph Data Model
       </Typography>
