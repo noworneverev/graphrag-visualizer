@@ -29,6 +29,7 @@
     "react-scripts": "5.0.1",
     "react-table": "^7.8.0",
     "three": "^0.167.1",
+    "three-spritetext": "^1.8.2",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },

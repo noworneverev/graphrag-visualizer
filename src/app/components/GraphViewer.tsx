@@ -34,6 +34,13 @@ import DetailDrawer from "./DetailDrawer";
 import { SearchResult } from "../models/search-result";
 import agent from "../api/agent";
 import APISearchDrawer from "./APISearchDrawer";
+import SpriteText from "three-spritetext";
+
+type Coords = {
+  x: number;
+  y: number;
+  z: number;
+};
 
 interface GraphViewerProps {
   data: CustomGraphData;
@@ -98,6 +105,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     []
   );
   const [showLabels, setShowLabels] = useState(false);
+  const [showLinkLabels, setShowLinkLabels] = useState(false);
   const [showHighlight, setShowHighlight] = useState(true);
   const graphRef = useRef<any>();
   const extraRenderers = [new CSS2DRenderer() as any as Renderer];
@@ -432,8 +440,8 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     if (!showLabels) return; // Only render the label if showLabels is true
 
     const label = node.name || "";
-    const fontSize = 10; // Smaller font size
-    const padding = 2; // Adjust padding to fit the smaller font size
+    const fontSize = 4;
+    const padding = 2;
     ctx.font = `${fontSize}px Sans-Serif`;
 
     // Set the styles based on the theme mode
@@ -441,7 +449,6 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       theme.palette.mode === "dark"
         ? "rgba(0, 0, 0, 0.6)"
         : "rgba(255, 255, 255, 0.6)";
-    // const textColor = theme.palette.mode === "dark" ? "white" : "black";
 
     // Calculate label dimensions
     const textWidth = ctx.measureText(label).width;
@@ -546,7 +553,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           zIndex: 1400,
           display: "flex",
           flexDirection: "column",
-          gap: 1, // Add some spacing between elements
+          gap: 2,
           alignItems: "flex-end",
         }}
       >
@@ -558,6 +565,57 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           >
             Search Nodes/Links
           </Button>
+          {/* <FormControlLabel
+            control={
+              <Switch
+                checked={graphType === "3d"}
+                onChange={onToggleGraphType}
+              />
+            }
+            label="3D View"
+          /> */}
+          {/* <FormControlLabel
+            control={
+              <Switch
+                checked={showLabels}
+                onChange={() => setShowLabels(!showLabels)}
+              />
+            }
+            label="Show Node Labels"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showLinkLabels}
+                onChange={() => setShowLinkLabels(!showLinkLabels)}
+              />
+            }
+            label="Show Relationship Labels"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showHighlight}
+                onChange={() => setShowHighlight(!showHighlight)}
+              />
+            }
+            label="Show Highlight"
+          /> */}
+          <Tooltip title={isFullscreen ? "Exit Full Screen" : "Full Screen"}>
+            <IconButton onClick={onToggleFullscreen} color="inherit">
+              {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            alignItems: "flex-start",
+          }}
+        >
           <FormControlLabel
             control={
               <Switch
@@ -574,7 +632,16 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 onChange={() => setShowLabels(!showLabels)}
               />
             }
-            label="Show Labels"
+            label="Show Node Labels"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showLinkLabels}
+                onChange={() => setShowLinkLabels(!showLinkLabels)}
+              />
+            }
+            label="Show Link Labels"
           />
           <FormControlLabel
             control={
@@ -585,11 +652,6 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             }
             label="Show Highlight"
           />
-          <Tooltip title={isFullscreen ? "Exit Full Screen" : "Full Screen"}>
-            <IconButton onClick={onToggleFullscreen} color="inherit">
-              {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-            </IconButton>
-          </Tooltip>
         </Box>
 
         <FormGroup>
@@ -721,6 +783,38 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
               renderNodeLabel(node as CustomNode, ctx);
             }
           }}
+          linkCanvasObjectMode={() => (showLinkLabels ? "after" : undefined)}
+          linkCanvasObject={(link, ctx) => {
+            if (showLinkLabels) {
+              const label = link.type || "";
+              const fontSize = 4;
+              ctx.font = `${fontSize}px Sans-Serif`;
+              ctx.fillStyle =
+                theme.palette.mode === "dark" ? "lightgray" : "darkgray";
+              const source =
+                typeof link.source !== "string"
+                  ? (link.source as CustomNode)
+                  : null;
+              const target =
+                typeof link.target !== "string"
+                  ? (link.target as CustomNode)
+                  : null;
+
+              if (
+                source &&
+                target &&
+                source.x !== undefined &&
+                target.x !== undefined &&
+                source.y !== undefined &&
+                target.y !== undefined
+              ) {
+                const textWidth = ctx.measureText(label).width;
+                const posX = (source.x + target.x) / 2 - textWidth / 2;
+                const posY = (source.y + target.y) / 2;
+                ctx.fillText(label, posX, posY);
+              }
+            }
+          }}
           onNodeHover={showHighlight ? handleNodeHover : undefined}
           onLinkHover={showHighlight ? handleLinkHover : undefined}
           onNodeClick={handleNodeClick}
@@ -750,6 +844,27 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           onLinkClick={handleLinkClick}
           backgroundColor={getBackgroundColor()}
           linkColor={get3DLinkColor}
+          linkThreeObjectExtend={true}
+          linkThreeObject={(link) => {
+            if (!showLinkLabels) new THREE.Object3D();
+            const sprite = new SpriteText(`${link.type}`);
+            sprite.color = "lightgrey";
+            sprite.textHeight = 1.5;
+            return sprite;
+          }}
+          linkPositionUpdate={(sprite, { start, end }) => {
+            if (!showLinkLabels) return;
+
+            const middlePos = ["x", "y", "z"].reduce((acc, c) => {
+              acc[c as keyof Coords] =
+                start[c as keyof Coords] +
+                (end[c as keyof Coords] - start[c as keyof Coords]) / 2;
+              return acc;
+            }, {} as Coords);
+
+            // Position sprite
+            Object.assign(sprite.position, middlePos);
+          }}
         />
       )}
       <Box
