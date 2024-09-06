@@ -216,7 +216,8 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
             </Card>
 
             {/* Context Data Tables */}
-            {apiSearchResults.context_data &&
+            {apiSearchResults &&
+              apiSearchResults.context_data &&
               Object.entries(apiSearchResults.context_data).map(
                 ([key, data], index) => (
                   <Card sx={{ marginTop: 2 }} key={index}>
@@ -238,21 +239,23 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
                       unmountOnExit
                     >
                       <CardContent>
-                        <TableContainer component={Paper}>
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow>
-                                {Object.keys(data[0]).map((columnName, idx) => (
-                                  <TableCell key={idx}>
-                                    {columnName.charAt(0).toUpperCase() +
-                                      columnName.slice(1)}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {(data as Array<Record<string, any>>).map(
-                                (row, rowIndex) => (
+                        {Array.isArray(data) && data.length > 0 ? (
+                          <TableContainer component={Paper}>
+                            <Table size="small">
+                              <TableHead>
+                                <TableRow>
+                                  {Object.keys(data[0]).map(
+                                    (columnName, idx) => (
+                                      <TableCell key={idx}>
+                                        {columnName.charAt(0).toUpperCase() +
+                                          columnName.slice(1)}
+                                      </TableCell>
+                                    )
+                                  )}
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {data.map((row, rowIndex) => (
                                   <TableRow key={rowIndex}>
                                     {Object.values(row).map(
                                       (value, cellIndex) => (
@@ -264,11 +267,15 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
                                       )
                                     )}
                                   </TableRow>
-                                )
-                              )}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        ) : (
+                          <Typography variant="body2" color="textSecondary">
+                            No data available
+                          </Typography>
+                        )}
                       </CardContent>
                     </Collapse>
                   </Card>
