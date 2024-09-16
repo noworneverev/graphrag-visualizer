@@ -22,7 +22,7 @@ Once the [graphrag-api](https://github.com/noworneverev/graphrag-api) server is 
 ![search](public/search.png)
 
 ## Graph Data Model
-The logic for creating relationships for text units, documents, communities, and covariates is derived from the [GraphRAG import Neo4j Cypher notebook](https://github.com/microsoft/graphrag/blob/community/graphrag_import_neo4j_cypher/examples_notebooks/community_contrib/neo4j/graphrag_import_neo4j_cypher.ipynb).
+The logic for creating relationships for text units, documents, communities, and covariates is derived from the [GraphRAG import Neo4j Cypher notebook](https://github.com/microsoft/graphrag/blob/main/examples_notebooks/community_contrib/neo4j/graphrag_import_neo4j_cypher.ipynb).
 
 
 ### Nodes

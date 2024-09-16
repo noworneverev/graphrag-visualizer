@@ -105,7 +105,7 @@ const Introduction: React.FC = () => {
         The logic for creating relationships for text units, documents,
         communities, and covariates is derived from the{" "}
         <Link
-          href="https://github.com/microsoft/graphrag/blob/community/graphrag_import_neo4j_cypher/examples_notebooks/community_contrib/neo4j/graphrag_import_neo4j_cypher.ipynb"
+          href="https://github.com/microsoft/graphrag/blob/main/examples_notebooks/community_contrib/neo4j/graphrag_import_neo4j_cypher.ipynb"
           target="_blank"
           rel="noopener"
         >
