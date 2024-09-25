@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  graphrag-visualizer:
+    image: graphrag-visualizer:1.0
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "3004:3004"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - /opt/dintal/work/graphrag-visualizer:/app/graphrag-visualizer/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

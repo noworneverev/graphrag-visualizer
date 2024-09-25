@@ -1,0 +1,38 @@
+{
+    "sourceFile": "src/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1727239352234,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1727239358233,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import React from \"react\";\n import ReactDOM from \"react-dom/client\";\n import App from \"./app/layout/App\";\n import reportWebVitals from \"./reportWebVitals\";\n-i\n+import \"\"\n \n const root = ReactDOM.createRoot(\n   document.getElementById(\"root\") as HTMLElement\n );\n"
+                },
+                {
+                    "date": 1727239363392,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import React from \"react\";\n import ReactDOM from \"react-dom/client\";\n import App from \"./app/layout/App\";\n import reportWebVitals from \"./reportWebVitals\";\n-import \"\"\n+import \"@/i18n\"\n \n const root = ReactDOM.createRoot(\n   document.getElementById(\"root\") as HTMLElement\n );\n"
+                },
+                {
+                    "date": 1727239391099,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import React from \"react\";\n import ReactDOM from \"react-dom/client\";\n import App from \"./app/layout/App\";\n import reportWebVitals from \"./reportWebVitals\";\n-import \"@/i18n\"\n+import \"@/i18n/\"\n \n const root = ReactDOM.createRoot(\n   document.getElementById(\"root\") as HTMLElement\n );\n"
+                },
+                {
+                    "date": 1727239553790,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import React from \"react\";\n import ReactDOM from \"react-dom/client\";\n import App from \"./app/layout/App\";\n import reportWebVitals from \"./reportWebVitals\";\n-import \"@/i18n/\"\n+import \"@/i18n\"\n \n const root = ReactDOM.createRoot(\n   document.getElementById(\"root\") as HTMLElement\n );\n"
+                },
+                {
+                    "date": 1727239681610,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import React from \"react\";\n import ReactDOM from \"react-dom/client\";\n import App from \"./app/layout/App\";\n import reportWebVitals from \"./reportWebVitals\";\n-import \"@/i18n\"\n+import \"./i18n\"\n \n const root = ReactDOM.createRoot(\n   document.getElementById(\"root\") as HTMLElement\n );\n"
+                }
+            ],
+            "date": 1727239352234,
+            "name": "Commit-0",
+            "content": "import React from \"react\";\nimport ReactDOM from \"react-dom/client\";\nimport App from \"./app/layout/App\";\nimport reportWebVitals from \"./reportWebVitals\";\ni\n\nconst root = ReactDOM.createRoot(\n  document.getElementById(\"root\") as HTMLElement\n);\nroot.render(\n  <React.StrictMode>\n    <App />\n  </React.StrictMode>\n);\n\n// If you want to start measuring performance in your app, pass a function\n// to log results (for example: reportWebVitals(console.log))\n// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals\nreportWebVitals();\n"
+        }
+    ]
+}

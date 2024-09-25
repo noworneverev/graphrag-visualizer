@@ -1,0 +1,98 @@
+{
+    "sourceFile": "src/i18n/i18next-config.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 20,
+            "patches": [
+                {
+                    "date": 1727232407469,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1727232496858,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,15 +37,8 @@\n     dintal: require(`./${lang}/dintal`).default,\n   },\n })\n \n-// Automatically generate the resources object\n-const resources = LanguagesSupported.reduce((acc: any, lang: string) => {\n-  // 获取项目名称\n-  const project = getProject()\n-  acc[lang] = loadLangResources(lang, project === \"default\" ? '' : `${project}/`)\n-  return acc\n-}, {})\n \n i18n.use(initReactI18next)\n   .init({\n     lng: 'zh-Hans',\n"
+                },
+                {
+                    "date": 1727232515032,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,10 +13,8 @@\n const loadLangResources = (lang: string, project: string) => ({\n   translation: {\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n-    login: require(`./${lang}/login`).default,\n-    register: require(`./${lang}/register`).default,\n     app: require(`./${lang}/${project}app`).default,\n     appOverview: require(`./${lang}/app-overview`).default,\n     appDebug: require(`./${lang}/app-debug`).default,\n     appApi: require(`./${lang}/app-api`).default,\n@@ -37,8 +35,15 @@\n     dintal: require(`./${lang}/dintal`).default,\n   },\n })\n \n+// Automatically generate the resources object\n+const resources = LanguagesSupported.reduce((acc: any, lang: string) => {\n+  // 获取项目名称\n+  const project = getProject()\n+  acc[lang] = loadLangResources(lang, project === \"default\" ? '' : `${project}/`)\n+  return acc\n+}, {})\n \n i18n.use(initReactI18next)\n   .init({\n     lng: 'zh-Hans',\n"
+                },
+                {
+                    "date": 1727232520868,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,25 +14,8 @@\n   translation: {\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     app: require(`./${lang}/${project}app`).default,\n-    appOverview: require(`./${lang}/app-overview`).default,\n-    appDebug: require(`./${lang}/app-debug`).default,\n-    appApi: require(`./${lang}/app-api`).default,\n-    appLog: require(`./${lang}/app-log`).default,\n-    appAnnotation: require(`./${lang}/app-annotation`).default,\n-    share: require(`./${lang}/share-app`).default,\n-    dataset: require(`./${lang}/dataset`).default,\n-    datasetDocuments: require(`./${lang}/dataset-documents`).default,\n-    datasetHitTesting: require(`./${lang}/dataset-hit-testing`).default,\n-    datasetSettings: require(`./${lang}/dataset-settings`).default,\n-    datasetCreation: require(`./${lang}/dataset-creation`).default,\n-    explore: require(`./${lang}/explore`).default,\n-    billing: require(`./${lang}/billing`).default,\n-    custom: require(`./${lang}/custom`).default,\n-    tools: require(`./${lang}/tools`).default,\n-    workflow: require(`./${lang}/workflow`).default,\n-    runLog: require(`./${lang}/run-log`).default,\n     dintal: require(`./${lang}/dintal`).default,\n   },\n })\n \n"
+                },
+                {
+                    "date": 1727232528670,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,16 +1,8 @@\n 'use client'\n import i18n from 'i18next'\n import { initReactI18next } from 'react-i18next'\n \n-import { LanguagesSupported } from '@/i18n/language'\n-\n-\n-// 获取 project 名称（只需处理客户端逻辑）\n-const getProject = () => {\n-  return Cookies.get('project') || 'default'\n-}\n-\n const loadLangResources = (lang: string, project: string) => ({\n   translation: {\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n"
+                },
+                {
+                    "date": 1727232571945,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n 'use client'\n import i18n from 'i18next'\n import { initReactI18next } from 'react-i18next'\n \n+\n const loadLangResources = (lang: string, project: string) => ({\n   translation: {\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n@@ -13,9 +14,8 @@\n \n // Automatically generate the resources object\n const resources = LanguagesSupported.reduce((acc: any, lang: string) => {\n   // 获取项目名称\n-  const project = getProject()\n   acc[lang] = loadLangResources(lang, project === \"default\" ? '' : `${project}/`)\n   return acc\n }, {})\n \n"
+                },
+                {
+                    "date": 1727232603840,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,7 +24,5 @@\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n     resources,\n   })\n-\n-export const changeLanguage = i18n.changeLanguage\n export default i18n\n"
+                },
+                {
+                    "date": 1727232739645,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n 'use client'\n import i18n from 'i18next'\n import { initReactI18next } from 'react-i18next'\n+import data from './languages.json'\n \n \n const loadLangResources = (lang: string, project: string) => ({\n   translation: {\n@@ -24,5 +25,6 @@\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n     resources,\n   })\n+\n export default i18n\n"
+                },
+                {
+                    "date": 1727232748759,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,11 @@\n 'use client'\n import i18n from 'i18next'\n import { initReactI18next } from 'react-i18next'\n+\n import data from './languages.json'\n \n+export const languages = data.languages\n \n const loadLangResources = (lang: string, project: string) => ({\n   translation: {\n     common: require(`./${lang}/common`).default,\n"
+                },
+                {
+                    "date": 1727232816850,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,9 +15,9 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = LanguagesSupported.reduce((acc: any, lang: string) => {\n+const resources = languages.reduce((acc: any, lang: string) => {\n   // 获取项目名称\n   acc[lang] = loadLangResources(lang, project === \"default\" ? '' : `${project}/`)\n   return acc\n }, {})\n"
+                },
+                {
+                    "date": 1727232838622,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, lang: string) => {\n   // 获取项目名称\n-  acc[lang] = loadLangResources(lang, project === \"default\" ? '' : `${project}/`)\n+  acc[lang] = loadLangResources(lang,`)\n   return acc\n }, {})\n \n i18n.use(initReactI18next)\n"
+                },
+                {
+                    "date": 1727232846738,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,9 +5,9 @@\n import data from './languages.json'\n \n export const languages = data.languages\n \n-const loadLangResources = (lang: string, project: string) => ({\n+const loadLangResources = (lang: string) => ({\n   translation: {\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     app: require(`./${lang}/${project}app`).default,\n@@ -17,9 +17,9 @@\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, lang: string) => {\n   // 获取项目名称\n-  acc[lang] = loadLangResources(lang,`)\n+  acc[lang] = loadLangResources(lang)\n   return acc\n }, {})\n \n i18n.use(initReactI18next)\n"
+                },
+                {
+                    "date": 1727232854721,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,8 @@\n const loadLangResources = (lang: string) => ({\n   translation: {\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n-    app: require(`./${lang}/${project}app`).default,\n     dintal: require(`./${lang}/dintal`).default,\n   },\n })\n \n"
+                },
+                {
+                    "date": 1727232927238,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,9 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((acc: any, lang: string) => {\n+const resources = languages.reduce(: any, lang: string) => {\n   // 获取项目名称\n   acc[lang] = loadLangResources(lang)\n   return acc\n }, {})\n"
+                },
+                {
+                    "date": 1727232933442,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,9 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce(: any, lang: string) => {\n+const resources = languages.reduce((: any, lang: string) => {\n   // 获取项目名称\n   acc[lang] = loadLangResources(lang)\n   return acc\n }, {})\n"
+                },
+                {
+                    "date": 1727232949319,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,9 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((: any, lang: string) => {\n+const resources = languages.reduce((prompt_name: any, lang: string) => {\n   // 获取项目名称\n   acc[lang] = loadLangResources(lang)\n   return acc\n }, {})\n"
+                },
+                {
+                    "date": 1727232959973,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,9 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((prompt_name: any, lang: string) => {\n+const resources = languages.reduce((prompt_name: string, value: string) => {\n   // 获取项目名称\n   acc[lang] = loadLangResources(lang)\n   return acc\n }, {})\n"
+                },
+                {
+                    "date": 1727232976290,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,11 +14,11 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((prompt_name: string, value: string) => {\n+const resources = languages.reduce((value: string) => {\n   // 获取项目名称\n-  acc[lang] = loadLangResources(lang)\n+  acc[value] = loadLangResources(value)\n   return acc\n }, {})\n \n i18n.use(initReactI18next)\n"
+                },
+                {
+                    "date": 1727233011428,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,9 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((value: string) => {\n+const resources = languages.reduce((prompt_name: string, value: string) => {\n   // 获取项目名称\n   acc[value] = loadLangResources(value)\n   return acc\n }, {})\n"
+                },
+                {
+                    "date": 1727233017994,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,11 +14,11 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((prompt_name: string, value: string) => {\n+const resources = languages.reduce((acc: any, lang: string) => {\n   // 获取项目名称\n-  acc[value] = loadLangResources(value)\n+  acc[lang] = loadLangResources(lang)\n   return acc\n }, {})\n \n i18n.use(initReactI18next)\n"
+                },
+                {
+                    "date": 1727233030192,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,11 +14,11 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((acc: any, lang: string) => {\n+const resources = languages.reduce((acc: any, value: string) => {\n   // 获取项目名称\n-  acc[lang] = loadLangResources(lang)\n+  acc[value] = loadLangResources(lang)\n   return acc\n }, {})\n \n i18n.use(initReactI18next)\n"
+                }
+            ],
+            "date": 1727232407469,
+            "name": "Commit-0",
+            "content": "'use client'\nimport i18n from 'i18next'\nimport { initReactI18next } from 'react-i18next'\n\nimport { LanguagesSupported } from '@/i18n/language'\n\n\n// 获取 project 名称（只需处理客户端逻辑）\nconst getProject = () => {\n  return Cookies.get('project') || 'default'\n}\n\nconst loadLangResources = (lang: string, project: string) => ({\n  translation: {\n    common: require(`./${lang}/common`).default,\n    layout: require(`./${lang}/layout`).default,\n    login: require(`./${lang}/login`).default,\n    register: require(`./${lang}/register`).default,\n    app: require(`./${lang}/${project}app`).default,\n    appOverview: require(`./${lang}/app-overview`).default,\n    appDebug: require(`./${lang}/app-debug`).default,\n    appApi: require(`./${lang}/app-api`).default,\n    appLog: require(`./${lang}/app-log`).default,\n    appAnnotation: require(`./${lang}/app-annotation`).default,\n    share: require(`./${lang}/share-app`).default,\n    dataset: require(`./${lang}/dataset`).default,\n    datasetDocuments: require(`./${lang}/dataset-documents`).default,\n    datasetHitTesting: require(`./${lang}/dataset-hit-testing`).default,\n    datasetSettings: require(`./${lang}/dataset-settings`).default,\n    datasetCreation: require(`./${lang}/dataset-creation`).default,\n    explore: require(`./${lang}/explore`).default,\n    billing: require(`./${lang}/billing`).default,\n    custom: require(`./${lang}/custom`).default,\n    tools: require(`./${lang}/tools`).default,\n    workflow: require(`./${lang}/workflow`).default,\n    runLog: require(`./${lang}/run-log`).default,\n    dintal: require(`./${lang}/dintal`).default,\n  },\n})\n\n// Automatically generate the resources object\nconst resources = LanguagesSupported.reduce((acc: any, lang: string) => {\n  // 获取项目名称\n  const project = getProject()\n  acc[lang] = loadLangResources(lang, project === \"default\" ? '' : `${project}/`)\n  return acc\n}, {})\n\ni18n.use(initReactI18next)\n  .init({\n    lng: 'zh-Hans',\n    fallbackLng: 'zh-Hans',\n    resources,\n  })\n\nexport const changeLanguage = i18n.changeLanguage\nexport default i18n\n"
+        }
+    ]
+}

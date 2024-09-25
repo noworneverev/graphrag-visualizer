@@ -7,9 +7,10 @@ import Introduction from "./Introduction";
 import useFileHandler from "../hooks/useFileHandler";
 import useGraphData from "../hooks/useGraphData";
 import DataTableContainer from "./DataTableContainer";
-import ReactGA from "react-ga4";
+import { useTranslation } from 'react-i18next';
 
 const GraphDataHandler: React.FC = () => {
+  const { t } = useTranslation('layout');
   const [tabIndex, setTabIndex] = useState(0);
   const [graphType, setGraphType] = useState<"2d" | "3d">("2d");
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -63,15 +64,6 @@ const GraphDataHandler: React.FC = () => {
     }
   }, [entities]);
 
-  useEffect(() => {
-    const measurementId = process.env.REACT_APP_GA_MEASUREMENT_ID;
-    if (measurementId) {
-      ReactGA.initialize(measurementId);
-    } else {
-      console.error("Google Analytics measurement ID not found");
-    }
-  }, []);
-
   const onDrop = (acceptedFiles: File[]) => {
     handleFilesRead(acceptedFiles);
   };
@@ -87,12 +79,6 @@ const GraphDataHandler: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
-    ReactGA.send({
-      hitType: "event",
-      eventCategory: "Tabs",
-      eventAction: "click",
-      eventLabel: `Tab ${newValue}`,
-    });
   };
 
   const toggleGraphType = () => {
@@ -106,9 +92,9 @@ const GraphDataHandler: React.FC = () => {
   return (
     <>
       <Tabs value={tabIndex} onChange={handleChange} centered>
-        <Tab label="Upload Artifacts" />
-        <Tab label="Graph Visualization" />
-        <Tab label="Data Tables" />
+        <Tab label={t('tabs.uploadArtifacts')} />
+        <Tab label={t('tabs.graphVisualization')} />
+        <Tab label={t('tabs.dataTables')} />
       </Tabs>
       {tabIndex === 0 && (
         <Container

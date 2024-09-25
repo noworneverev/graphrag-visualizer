@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ReactGA from "react-ga4";
 
 import GraphDataHandler from "../components/GraphDataHandler";
 import {
@@ -16,8 +15,10 @@ import {
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import { useTranslation } from 'react-i18next';
 
 const App: React.FC = () => {
+  const { t } = useTranslation('layout');
   const [darkMode, setDarkMode] = useState(true);
   const paletteType = darkMode ? "dark" : "light";
 
@@ -58,19 +59,6 @@ const App: React.FC = () => {
     setDarkMode(currentTheme === "dark");
   }, []);
 
-  useEffect(() => {
-    const measurementId = process.env.REACT_APP_GA_MEASUREMENT_ID;
-    if (measurementId) {
-      ReactGA.initialize(measurementId);
-      ReactGA.send({
-        hitType: "pageview",
-        page: window.location.pathname + window.location.search,
-      });
-    } else {
-      console.error("Google Analytics measurement ID not found");
-    }
-  }, []);
-
   return (
     <ThemeProvider theme={theme}>
       <Container disableGutters maxWidth={false}>
@@ -99,13 +87,13 @@ const App: React.FC = () => {
             <GitHubIcon />
           </IconButton>
           {darkMode ? (
-            <Tooltip title="Turn on the light">
+            <Tooltip  title={t('tooltip.turnOnLight')}>
               <IconButton onClick={handleThemeChange} color="inherit">
                 <DarkModeOutlinedIcon />
               </IconButton>
             </Tooltip>
           ) : (
-            <Tooltip title="Turn off the light">
+            <Tooltip  title={t('tooltip.turnOffLight')}>
               <IconButton onClick={handleThemeChange} color="inherit">
                 <LightModeOutlinedIcon />
               </IconButton>

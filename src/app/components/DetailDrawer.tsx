@@ -25,6 +25,7 @@ import { documentColumns } from "../models/document";
 import { covariateColumns } from "../models/covariate";
 import { MRT_ColumnDef } from "material-react-table";
 import { entityColumns } from "../models/entity";
+import { useTranslation } from 'react-i18next';
 
 interface DetailDrawerProps {
   bottomDrawerOpen: boolean;
@@ -43,6 +44,8 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({
   linkedNodes,
   linkedRelationships,
 }) => {
+  const { t } = useTranslation('dataview');
+
   const getNodeName = (node: string | CustomNode) => {
     return typeof node === "object" ? node.name : node;
   };
@@ -117,177 +120,153 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({
 
   return (
     <Drawer
-      anchor="bottom"
-      open={bottomDrawerOpen}
-      onClose={() => setBottomDrawerOpen(false)}
-      sx={{ zIndex: 1500 }}
-    >
-      <Box sx={{ width: "100%", padding: 3 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 2,
-          }}
-        >
-          {selectedNode ? (
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              {/* Node Details: {selectedNode.id.toString()} */}
-              Node Details: {selectedNode.name.toString()}
-            </Typography>
-          ) : (
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              {" "}
-              {selectedRelationship && (
-                <>
-                  {"(:"}
-                  {getNodeType(selectedRelationship.source)} {"{name: "}
-                  {"'"}
-                  {getNodeName(selectedRelationship.source)}
-                  {"'"}
-                  {"}"}
-                  {")"}
-                  {"-[:"}
-                  {selectedRelationship.type}
-                  {"]->"}
-                  {"(:"}
-                  {getNodeType(selectedRelationship.target)} {"{name: "}
-                  {"'"}
-                  {getNodeName(selectedRelationship.target)}
-                  {"'"}
-                  {"}"}
-                  {")"}
-                </>
-              )}
-            </Typography>
-          )}
-          <IconButton
-            onClick={() => setBottomDrawerOpen(false)}
-            sx={{ marginLeft: "auto" }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        {selectedNode && (
-          <Card sx={{ marginBottom: 3 }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                Node Information
-              </Typography>
-              <Typography>ID: {selectedNode.uuid}</Typography>
-              <Typography>Name: {selectedNode.name}</Typography>
-              {selectedNode.covariate_type && (
-                <Typography>
-                  Covariate Type: {selectedNode.covariate_type}
-                </Typography>
-              )}
-              <Typography>Type: {selectedNode.type}</Typography>
-              {selectedNode.title && (
-                <Typography>Title: {selectedNode.title}</Typography>
-              )}
-              {selectedNode.summary && (
-                <Typography>Summary: {selectedNode.summary}</Typography>
-              )}
-              {selectedNode.n_tokens && (
-                <Typography>
-                  Number of Tokens: {selectedNode.n_tokens}
-                </Typography>
-              )}
-
-              {selectedNode.description && (
-                <Typography>Description: {selectedNode.description}</Typography>
-              )}
-              {selectedNode.human_readable_id && (
-                <Typography>
-                  Human Readable ID: {selectedNode.human_readable_id}
-                </Typography>
-              )}
-
-              {/* {selectedNode.human_readable_id ||
-                (selectedNode.human_readable_id === 0 && (
-                  <Typography>
-                    Human Readable ID: {selectedNode.human_readable_id}
-                  </Typography>
-                ))} */}
-              {selectedNode.raw_content && (
-                <Typography>Raw Content: {selectedNode.raw_content}</Typography>
-              )}
-            </CardContent>
-          </Card>
-        )}
-        {selectedRelationship && (
-          <Card sx={{ marginBottom: 3 }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                Relationship Information:
-              </Typography>
-              <Typography>ID: {selectedRelationship.id}</Typography>
-
-              <Typography>
-                Source: {getNodeName(selectedRelationship.source)}
-              </Typography>
-              <Typography>
-                Target: {getNodeName(selectedRelationship.target)}
-              </Typography>
-              <Typography>Type: {selectedRelationship.type}</Typography>
-              {selectedRelationship.description && (
-                <Typography>
-                  Description: {selectedRelationship.description}
-                </Typography>
-              )}
-              {selectedRelationship.human_readable_id && (
-                <Typography>
-                  Human Readable ID: {selectedRelationship.human_readable_id}
-                </Typography>
-              )}
-              {selectedRelationship.weight && (
-                <Typography>Weight: {selectedRelationship.weight}</Typography>
-              )}
-              {selectedRelationship.source_degree && (
-                <Typography>
-                  Source Degree: {selectedRelationship.source_degree}
-                </Typography>
-              )}
-              {selectedRelationship.target_degree && (
-                <Typography>
-                  Target Degree: {selectedRelationship.target_degree}
-                </Typography>
-              )}
-              {selectedRelationship.rank && (
-                <Typography>Rank: {selectedRelationship.rank}</Typography>
-              )}
-            </CardContent>
-          </Card>
-        )}
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-            Linked Nodes
+    anchor="bottom"
+    open={bottomDrawerOpen}
+    onClose={() => setBottomDrawerOpen(false)}
+    sx={{ zIndex: 1500 }}
+  >
+    <Box sx={{ width: "100%", padding: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 2,
+        }}
+      >
+        {selectedNode ? (
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            {t('detailDrawer.nodeDetails', { name: selectedNode.name.toString() })}
           </Typography>
+        ) : (
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            {selectedRelationship && t('detailDrawer.relationshipDetails', {
+              sourceType: getNodeType(selectedRelationship.source),
+              sourceName: getNodeName(selectedRelationship.source),
+              relationshipType: selectedRelationship.type,
+              targetType: getNodeType(selectedRelationship.target),
+              targetName: getNodeName(selectedRelationship.target),
+            })}
+          </Typography>
+        )}
+        <IconButton
+          onClick={() => setBottomDrawerOpen(false)}
+          sx={{ marginLeft: "auto" }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      {selectedNode && (
+        <Card sx={{ marginBottom: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              {t('detailDrawer.nodeInformation')}
+            </Typography>
+            <Typography>{t('detailDrawer.id')}: {selectedNode.uuid}</Typography>
+            <Typography>{t('detailDrawer.name')}: {selectedNode.name}</Typography>
+            {selectedNode.covariate_type && (
+              <Typography>
+                {t('detailDrawer.covariateType')}: {selectedNode.covariate_type}
+              </Typography>
+            )}
+            <Typography>{t('detailDrawer.type')}: {selectedNode.type}</Typography>
+            {selectedNode.title && (
+              <Typography>{t('detailDrawer.title')}: {selectedNode.title}</Typography>
+            )}
+            {selectedNode.summary && (
+              <Typography>{t('detailDrawer.summary')}: {selectedNode.summary}</Typography>
+            )}
+            {selectedNode.n_tokens && (
+              <Typography>
+                {t('detailDrawer.numberOfTokens')}: {selectedNode.n_tokens}
+              </Typography>
+            )}
+
+            {selectedNode.description && (
+              <Typography>{t('detailDrawer.description')}: {selectedNode.description}</Typography>
+            )}
+            {selectedNode.human_readable_id && (
+              <Typography>
+                {t('detailDrawer.humanReadableId')}: {selectedNode.human_readable_id}
+              </Typography>
+            )}
+            {selectedNode.raw_content && (
+              <Typography>{t('detailDrawer.rawContent')}: {selectedNode.raw_content}</Typography>
+            )}
+          </CardContent>
+        </Card>
+      )}
+      {selectedRelationship && (
+        <Card sx={{ marginBottom: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              {t('detailDrawer.relationshipInformation')}
+            </Typography>
+            <Typography>{t('detailDrawer.id')}: {selectedRelationship.id}</Typography>
+
+            <Typography>
+              {t('detailDrawer.source')}: {getNodeName(selectedRelationship.source)}
+            </Typography>
+            <Typography>
+              {t('detailDrawer.target')}: {getNodeName(selectedRelationship.target)}
+            </Typography>
+            <Typography>{t('detailDrawer.type')}: {selectedRelationship.type}</Typography>
+            {selectedRelationship.description && (
+              <Typography>
+                {t('detailDrawer.description')}: {selectedRelationship.description}
+              </Typography>
+            )}
+            {selectedRelationship.human_readable_id && (
+              <Typography>
+                {t('detailDrawer.humanReadableId')}: {selectedRelationship.human_readable_id}
+              </Typography>
+            )}
+            {selectedRelationship.weight && (
+              <Typography>{t('detailDrawer.weight')}: {selectedRelationship.weight}</Typography>
+            )}
+            {selectedRelationship.source_degree && (
+              <Typography>
+                {t('detailDrawer.sourceDegree')}: {selectedRelationship.source_degree}
+              </Typography>
+            )}
+            {selectedRelationship.target_degree && (
+              <Typography>
+                {t('detailDrawer.targetDegree')}: {selectedRelationship.target_degree}
+              </Typography>
+            )}
+            {selectedRelationship.rank && (
+              <Typography>{t('detailDrawer.rank')}: {selectedRelationship.rank}</Typography>
+            )}
+          </CardContent>
+        </Card>
+      )}
+      <Box sx={{ marginBottom: 2 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+          {t('detailDrawer.linkedNodes')}
+        </Typography>
+        <DataTable
+          columns={filteredColumns}
+          data={linkedNodes}
+        />
+      </Box>
+      {selectedNode && (
+        <Box>
+          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+            {t('detailDrawer.linkedRelationships')}
+          </Typography>
+
           <DataTable
-            // columns={customNodeColumns}
-            columns={filteredColumns}
-            data={linkedNodes}
+            columns={customLinkColumns}
+            data={linkedRelationships.map((link) => ({
+              ...link,
+              source: getNodeName(link.source),
+              target: getNodeName(link.target),
+            }))}
           />
         </Box>
-        {selectedNode && (
-          <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-              Linked Relationships
-            </Typography>
-
-            <DataTable
-              columns={customLinkColumns}
-              data={linkedRelationships.map((link) => ({
-                ...link,
-                source: getNodeName(link.source),
-                target: getNodeName(link.target),
-              }))}
-            />
-          </Box>
-        )}
-      </Box>
-    </Drawer>
+      )}
+    </Box>
+  </Drawer>
   );
 };
 

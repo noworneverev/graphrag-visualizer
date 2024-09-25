@@ -1,0 +1,51 @@
+const translation = {
+  api: {
+    success: 'Success',
+    actionSuccess: 'Action succeeded',
+    saved: 'Saved',
+    create: 'Created',
+    remove: 'Removed',
+  },
+  operation: {
+    create: 'Create',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    clear: 'Clear',
+    save: 'Save',
+    saveAndEnable: 'Save & Enable',
+    edit: 'Edit',
+    add: 'Add',
+    added: 'Added',
+    refresh: 'Restart',
+    reset: 'Reset',
+    search: 'Search',
+    change: 'Change',
+    remove: 'Remove',
+    send: 'Send',
+    copy: 'Copy',
+    lineBreak: 'Line break',
+    sure: 'I\'m sure',
+    download: 'Download',
+    delete: 'Delete',
+    settings: 'Settings',
+    setup: 'Setup',
+    getForFree: 'Get for free',
+    reload: 'Reload',
+    ok: 'OK',
+    log: 'Log',
+    learnMore: 'Learn More',
+    params: 'Params',
+    duplicate: 'Duplicate',
+    rename: 'Rename',
+  },
+  errorMsg: {
+    fieldRequired: '{{field}} is required',
+    urlError: 'url should start with http:// or https://',
+  },
+  placeholder: {
+    input: 'Please enter',
+    select: 'Please select',
+  }
+}
+
+export default translation

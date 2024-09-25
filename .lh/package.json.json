@@ -1,0 +1,26 @@
+{
+    "sourceFile": "package.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1727231115264,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1727231136304,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,10 +30,11 @@\n     \"react-table\": \"^7.8.0\",\n     \"three\": \"^0.167.1\",\n     \"three-spritetext\": \"^1.8.2\",\n     \"typescript\": \"^4.9.5\",\n-    \"web-vitals\": \"^2.1.4\"\n+    \"web-vitals\": \"^2.1.4\",\n     \"i18next\": \"^22.4.13\",\n+    \"react-i18next\": \"^12.2.0\",\n   },\n   \"scripts\": {\n     \"predeploy\": \"npm run build\",\n     \"deploy\": \"gh-pages -d build\",\n"
+                },
+                {
+                    "date": 1727236542214,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,17 +24,16 @@\n     \"react-dom\": \"^18.3.1\",\n     \"react-dropzone\": \"^14.2.3\",\n     \"react-force-graph-2d\": \"^1.25.5\",\n     \"react-force-graph-3d\": \"^1.24.3\",\n-    \"react-ga4\": \"^2.1.0\",\n     \"react-scripts\": \"^5.0.1\",\n     \"react-table\": \"^7.8.0\",\n     \"three\": \"^0.167.1\",\n     \"three-spritetext\": \"^1.8.2\",\n     \"typescript\": \"^4.9.5\",\n     \"web-vitals\": \"^2.1.4\",\n     \"i18next\": \"^22.4.13\",\n-    \"react-i18next\": \"^12.2.0\",\n+    \"react-i18next\": \"^12.2.0\"\n   },\n   \"scripts\": {\n     \"predeploy\": \"npm run build\",\n     \"deploy\": \"gh-pages -d build\",\n"
+                }
+            ],
+            "date": 1727231115264,
+            "name": "Commit-0",
+            "content": "{\n  \"name\": \"graphrag-visualizer\",\n  \"version\": \"0.1.0\",\n  \"homepage\": \"https://noworneverev.github.io/graphrag-visualizer/\",\n  \"private\": true,\n  \"dependencies\": {\n    \"@emotion/react\": \"^11.13.0\",\n    \"@emotion/styled\": \"^11.13.0\",\n    \"@mui/icons-material\": \"^5.16.5\",\n    \"@mui/material\": \"^5.16.5\",\n    \"@testing-library/jest-dom\": \"^5.17.0\",\n    \"@testing-library/react\": \"^13.4.0\",\n    \"@testing-library/user-event\": \"^13.5.0\",\n    \"@types/jest\": \"^27.5.2\",\n    \"@types/node\": \"^16.18.104\",\n    \"@types/react\": \"^18.3.3\",\n    \"@types/react-dom\": \"^18.3.0\",\n    \"axios\": \"^1.7.2\",\n    \"fuse.js\": \"^7.0.0\",\n    \"hyparquet\": \"^1.1.0\",\n    \"material-react-table\": \"^2.13.1\",\n    \"react\": \"^18.3.1\",\n    \"react-app-rewired\": \"^2.2.1\",\n    \"react-dom\": \"^18.3.1\",\n    \"react-dropzone\": \"^14.2.3\",\n    \"react-force-graph-2d\": \"^1.25.5\",\n    \"react-force-graph-3d\": \"^1.24.3\",\n    \"react-ga4\": \"^2.1.0\",\n    \"react-scripts\": \"^5.0.1\",\n    \"react-table\": \"^7.8.0\",\n    \"three\": \"^0.167.1\",\n    \"three-spritetext\": \"^1.8.2\",\n    \"typescript\": \"^4.9.5\",\n    \"web-vitals\": \"^2.1.4\"\n    \"i18next\": \"^22.4.13\",\n  },\n  \"scripts\": {\n    \"predeploy\": \"npm run build\",\n    \"deploy\": \"gh-pages -d build\",\n    \"start\": \"PORT=3004 react-app-rewired start\",\n    \"build\": \"react-app-rewired build\",\n    \"test\": \"react-app-rewired test\",\n    \"eject\": \"react-scripts eject\"\n  },\n  \"eslintConfig\": {\n    \"extends\": [\n      \"react-app\",\n      \"react-app/jest\"\n    ]\n  },\n  \"browserslist\": {\n    \"production\": [\n      \">0.2%\",\n      \"not dead\",\n      \"not op_mini all\"\n    ],\n    \"development\": [\n      \"last 1 chrome version\",\n      \"last 1 firefox version\",\n      \"last 1 safari version\"\n    ]\n  },\n  \"devDependencies\": {\n    \"@types/react-table\": \"^7.7.20\",\n    \"@types/three\": \"^0.167.1\",\n    \"gh-pages\": \"^6.1.1\"\n  }\n}\n"
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+{
+    "sourceFile": "src/app/components/DropZone.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 6,
+            "patches": [
+                {
+                    "date": 1727240020326,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1727240034436,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n import React from \"react\";\n import { Box, Typography } from \"@mui/material\";\n import { useTheme } from \"@mui/material/styles\";\n import { useTranslation } from 'react-i18next';\n+const { t } = useTranslation();\n \n interface DropZoneProps {\n   getRootProps: () => any;\n   getInputProps: () => any;\n"
+                },
+                {
+                    "date": 1727240054146,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n import React from \"react\";\n import { Box, Typography } from \"@mui/material\";\n import { useTheme } from \"@mui/material/styles\";\n import { useTranslation } from 'react-i18next';\n+\n const { t } = useTranslation();\n \n interface DropZoneProps {\n   getRootProps: () => any;\n@@ -39,9 +40,9 @@\n       }}\n     >\n       <input {...getInputProps()} {...({ webkitdirectory: \"true\" } as any)} />\n       {isDragActive ? (\n-        <Typography variant=\"body1\">Drop the files here...</Typography>\n+        <Typography variant=\"body1\">{t('dropZone.dropFilesHere')}Drop the files here...</Typography>\n       ) : (\n         <Typography variant=\"body1\">\n           Drag 'n' drop parquet files here, or click to select files\n         </Typography>\n"
+                },
+                {
+                    "date": 1727240073212,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -40,12 +40,12 @@\n       }}\n     >\n       <input {...getInputProps()} {...({ webkitdirectory: \"true\" } as any)} />\n       {isDragActive ? (\n-        <Typography variant=\"body1\">{t('dropZone.dropFilesHere')}Drop the files here...</Typography>\n+        <Typography variant=\"body1\">{t('dropZone.dropFilesHere')}</Typography>\n       ) : (\n         <Typography variant=\"body1\">\n-          Drag 'n' drop parquet files here, or click to select files\n+          {t('dropZone.dragAndDrop')}\n         </Typography>\n       )}\n     </Box>\n   );\n"
+                },
+                {
+                    "date": 1727240260651,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,52 @@\n+import React from \"react\";\n+import { Box, Typography } from \"@mui/material\";\n+import { useTheme } from \"@mui/material/styles\";\n+import { useTranslation } from 'react-i18next';\n+\n+interface DropZoneProps {\n+  getRootProps: () => any;\n+  getInputProps: () => any;\n+  isDragActive: boolean;\n+}\n+\n+const DropZone: React.FC<DropZoneProps> = ({\n+  getRootProps,\n+  getInputProps,\n+  isDragActive,\n+}) => {\n+  const theme = useTheme();\n+\n+  return (\n+    <Box\n+      {...getRootProps()}\n+      sx={{\n+        border: \"2px dashed gray\",\n+        borderRadius: \"4px\",\n+        padding: \"20px\",\n+        textAlign: \"center\",\n+        cursor: \"pointer\",\n+        backgroundColor: isDragActive\n+          ? theme.palette.action.hover\n+          : theme.palette.background.default,\n+        color: theme.palette.text.primary,\n+        height: \"150px\",\n+        display: \"flex\",\n+        alignItems: \"center\",\n+        justifyContent: \"center\",\n+\n+        mb: 2,\n+      }}\n+    >\n+      <input {...getInputProps()} {...({ webkitdirectory: \"true\" } as any)} />\n+      {isDragActive ? (\n+        <Typography variant=\"body1\">{t('dropZone.dropFilesHere')}</Typography>\n+      ) : (\n+        <Typography variant=\"body1\">\n+          {t('dropZone.dragAndDrop')}\n+        </Typography>\n+      )}\n+    </Box>\n+  );\n+};\n+\n+export default DropZone;\n"
+                },
+                {
+                    "date": 1727240266251,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,62 +13,10 @@\n   getRootProps,\n   getInputProps,\n   isDragActive,\n }) => {\n-  const theme = useTheme();\n+  const { t } = useTranslation();\n \n-  return (\n-    <Box\n-      {...getRootProps()}\n-      sx={{\n-        border: \"2px dashed gray\",\n-        borderRadius: \"4px\",\n-        padding: \"20px\",\n-        textAlign: \"center\",\n-        cursor: \"pointer\",\n-        backgroundColor: isDragActive\n-          ? theme.palette.action.hover\n-          : theme.palette.background.default,\n-        color: theme.palette.text.primary,\n-        height: \"150px\",\n-        display: \"flex\",\n-        alignItems: \"center\",\n-        justifyContent: \"center\",\n-\n-        mb: 2,\n-      }}\n-    >\n-      <input {...getInputProps()} {...({ webkitdirectory: \"true\" } as any)} />\n-      {isDragActive ? (\n-        <Typography variant=\"body1\">{t('dropZone.dropFilesHere')}</Typography>\n-      ) : (\n-        <Typography variant=\"body1\">\n-          {t('dropZone.dragAndDrop')}\n-        </Typography>\n-      )}\n-    </Box>\n-  );\n-};\n-\n-export default DropZone;\n-import React from \"react\";\n-import { Box, Typography } from \"@mui/material\";\n-import { useTheme } from \"@mui/material/styles\";\n-import { useTranslation } from 'react-i18next';\n-\n-const { t } = useTranslation();\n-\n-interface DropZoneProps {\n-  getRootProps: () => any;\n-  getInputProps: () => any;\n-  isDragActive: boolean;\n-}\n-\n-const DropZone: React.FC<DropZoneProps> = ({\n-  getRootProps,\n-  getInputProps,\n-  isDragActive,\n-}) => {\n   const theme = useTheme();\n \n   return (\n     <Box\n"
+                },
+                {
+                    "date": 1727240898513,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,10 +13,9 @@\n   getRootProps,\n   getInputProps,\n   isDragActive,\n }) => {\n-  const { t } = useTranslation();\n-\n+  const { t } = useTranslation('');\n   const theme = useTheme();\n \n   return (\n     <Box\n"
+                }
+            ],
+            "date": 1727240020326,
+            "name": "Commit-0",
+            "content": "import React from \"react\";\nimport { Box, Typography } from \"@mui/material\";\nimport { useTheme } from \"@mui/material/styles\";\nimport { useTranslation } from 'react-i18next';\n\ninterface DropZoneProps {\n  getRootProps: () => any;\n  getInputProps: () => any;\n  isDragActive: boolean;\n}\n\nconst DropZone: React.FC<DropZoneProps> = ({\n  getRootProps,\n  getInputProps,\n  isDragActive,\n}) => {\n  const theme = useTheme();\n\n  return (\n    <Box\n      {...getRootProps()}\n      sx={{\n        border: \"2px dashed gray\",\n        borderRadius: \"4px\",\n        padding: \"20px\",\n        textAlign: \"center\",\n        cursor: \"pointer\",\n        backgroundColor: isDragActive\n          ? theme.palette.action.hover\n          : theme.palette.background.default,\n        color: theme.palette.text.primary,\n        height: \"150px\",\n        display: \"flex\",\n        alignItems: \"center\",\n        justifyContent: \"center\",\n\n        mb: 2,\n      }}\n    >\n      <input {...getInputProps()} {...({ webkitdirectory: \"true\" } as any)} />\n      {isDragActive ? (\n        <Typography variant=\"body1\">Drop the files here...</Typography>\n      ) : (\n        <Typography variant=\"body1\">\n          Drag 'n' drop parquet files here, or click to select files\n        </Typography>\n      )}\n    </Box>\n  );\n};\n\nexport default DropZone;\n"
+        }
+    ]
+}

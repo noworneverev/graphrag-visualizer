@@ -25,6 +25,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { SearchResult } from "../models/search-result";
+import { useTranslation } from 'react-i18next';
 
 interface APISearchDrawerProps {
   apiDrawerOpen: boolean;
@@ -50,6 +51,7 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
   hasCovariates,
   serverUp,
 }) => {
+  const { t } = useTranslation('graphViewer');
   const [query, setQuery] = useState<string>("");
   const [loadingLocal, setLoadingLocal] = useState<boolean>(false);
   const [loadingGlobal, setLoadingGlobal] = useState<boolean>(false);
@@ -121,7 +123,7 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
             //     await handleSearch("local"); // Default to global search on enter
             //   }
             // }}
-            placeholder="Enter search query for API"
+            placeholder={t('apiSearchDrawer.placeholder') || 'Enter search query for API'}
             fullWidth
             margin="normal"
           />
@@ -139,7 +141,7 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
                 loadingGlobal
               }
             >
-              {loadingLocal ? <CircularProgress size={24} /> : "Local Search"}
+              {loadingLocal ? <CircularProgress size={24} /> : t('apiSearchDrawer.localSearch')}
             </Button>
             <Button
               variant="contained"
@@ -153,34 +155,31 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
                 loadingGlobal
               }
             >
-              {loadingGlobal ? <CircularProgress size={24} /> : "Global Search"}
+              {loadingGlobal ? <CircularProgress size={24} /> : t('apiSearchDrawer.globalSearch')}
             </Button>
           </Box>
 
           {!serverUp && (
             <Alert severity="error" sx={{ mt: 1 }}>
-              Server is not running. Please start the server to use the API.
-              Follow the instructions at{" "}
+              {t('apiSearchDrawer.serverNotRunning')}{" "}
               <Link
                 href="https://github.com/noworneverev/graphrag-api"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                graphrag-api
+                {t('apiSearchDrawer.graphragApi')}
               </Link>
               .
             </Alert>
           )}
           {!localSearchEnabled && (
             <Alert severity="warning" sx={{ mt: 1 }}>
-              Please enable "Include Text Unit" and "Include Communities"
-              {hasCovariates && ', and "Include Covariates"'} to use Local
-              Search.
+              {t('apiSearchDrawer.enableLocalSearch', { hasCovariates })}
             </Alert>
           )}
           {!globalSearchEnabled && (
             <Alert severity="warning" sx={{ mt: 1 }}>
-              Please enable "Include Communities" to use Global Search.
+              {t('apiSearchDrawer.enableGlobalSearch')}
             </Alert>
           )}
         </Box>
@@ -202,11 +201,11 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
               <CardHeader title="Metadata" />
               <CardContent>
                 <Typography variant="body2">
-                  <strong>Completion Time:</strong>{" "}
+                  <strong>{t('apiSearchDrawer.completionTime')}:</strong>{" "}
                   {apiSearchResults.completion_time} ms
                 </Typography>
                 <Typography variant="body2">
-                  <strong>LLM Calls:</strong> {apiSearchResults.llm_calls}
+                  <strong>{t('apiSearchDrawer.llmCalls')}:</strong> {apiSearchResults.llm_calls}
                 </Typography>
                 <Typography variant="body2">
                   <strong>Prompt Tokens:</strong>{" "}

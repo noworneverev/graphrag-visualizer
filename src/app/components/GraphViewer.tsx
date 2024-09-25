@@ -35,6 +35,7 @@ import { SearchResult } from "../models/search-result";
 import agent from "../api/agent";
 import APISearchDrawer from "./APISearchDrawer";
 import SpriteText from "three-spritetext";
+import { useTranslation } from 'react-i18next';
 
 type Coords = {
   x: number;
@@ -83,6 +84,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   hasCommunities,
   hasCovariates,
 }) => {
+  const { t } = useTranslation('graphViewer');
   const theme = useTheme();
   const [highlightNodes, setHighlightNodes] = useState<Set<CustomNode>>(
     new Set()
@@ -563,7 +565,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             onClick={toggleDrawer(true)}
             startIcon={<SearchIcon />}
           >
-            Search Nodes/Links
+            {t('graphViewer.searchNodesLinks')}
           </Button>
           {/* <FormControlLabel
             control={
@@ -601,7 +603,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             }
             label="Show Highlight"
           /> */}
-          <Tooltip title={isFullscreen ? "Exit Full Screen" : "Full Screen"}>
+          <Tooltip title={isFullscreen ? t('graphViewer.exitFullScreen') : t('graphViewer.fullScreen')}>
             <IconButton onClick={onToggleFullscreen} color="inherit">
               {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
             </IconButton>
@@ -623,7 +625,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 onChange={onToggleGraphType}
               />
             }
-            label="3D View"
+            label={t('graphViewer.view3D')}
           />
           <FormControlLabel
             control={
@@ -632,7 +634,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 onChange={() => setShowLabels(!showLabels)}
               />
             }
-            label="Show Node Labels"
+            label={t('graphViewer.showNodeLabels')}
           />
           <FormControlLabel
             control={
@@ -641,7 +643,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 onChange={() => setShowLinkLabels(!showLinkLabels)}
               />
             }
-            label="Show Link Labels"
+            label={t('graphViewer.showLinkLabels')}
           />
           <FormControlLabel
             control={
@@ -650,7 +652,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 onChange={() => setShowHighlight(!showHighlight)}
               />
             }
-            label="Show Highlight"
+            label={t('graphViewer.showHighlight')}
           />
         </Box>
 
@@ -663,7 +665,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 disabled={!hasDocuments || apiSearchResults !== null}
               />
             }
-            label="Include Documents"
+            label={t('graphViewer.includeDocuments')}
           />
           <FormControlLabel
             control={
@@ -683,7 +685,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 disabled={!hasTextUnits || apiSearchResults !== null}
               />
             }
-            label="Include Text Units"
+            label={t('graphViewer.includeTextUnits')}
           />
           <FormControlLabel
             control={
@@ -693,7 +695,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 disabled={!hasCommunities || apiSearchResults !== null}
               />
             }
-            label="Include Communities"
+            label={t('graphViewer.includeCommunities')}
           />
 
           <FormControlLabel
@@ -713,7 +715,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
                 disabled={!hasCovariates || apiSearchResults !== null}
               />
             }
-            label="Include Covariates"
+            label={t('graphViewer.includeCovariates')}
           />
         </FormGroup>
       </Box>
@@ -879,14 +881,14 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           gap: 1,
         }}
       >
-        <Typography variant="body2">Nodes: {nodeCount}</Typography>
-        <Typography variant="body2">Relationships: {linkCount}</Typography>
+        <Typography variant="body2">{t('graphViewer.nodes')}: {nodeCount}</Typography>
+        <Typography variant="body2">{t('graphViewer.relationships')}: {linkCount}</Typography>
         <Button
           variant="contained"
           onClick={toggleApiDrawer(true)}
           startIcon={<SearchIcon />}
         >
-          Ask Query (Local/Global Search)
+          {t('graphViewer.askQuery')}
         </Button>
         <Button
           variant="contained"
@@ -895,7 +897,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           color="warning"
           disabled={apiSearchResults === null}
         >
-          Clear Query Results
+          {t('graphViewer.clearQueryResults')}
         </Button>
       </Box>
     </Box>

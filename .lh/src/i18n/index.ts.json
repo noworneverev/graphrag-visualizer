@@ -1,0 +1,142 @@
+{
+    "sourceFile": "src/i18n/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 31,
+            "patches": [
+                {
+                    "date": 1727233387390,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1727233393264,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,15 +4,8 @@\n \n import data from './languages.json'\n \n export const languages = data.languages\n-interface Language {\n-  value: string;\n-  name: string;\n-  prompt_name: string;\n-  example: string;\n-  supported: boolean;\n-}\n \n const loadLangResources = (lang: string) => ({\n   translation: {\n     common: require(`./${lang}/common`).default,\n"
+                },
+                {
+                    "date": 1727233407978,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,10 +3,18 @@\n import { initReactI18next } from 'react-i18next'\n \n import data from './languages.json'\n \n-export const languages = data.languages\n+interface Language {\n+  value: string;\n+  name: string;\n+  prompt_name: string;\n+  example: string;\n+  supported: boolean;\n+}\n \n+export const languages: Language[] = data.languages\n+\n const loadLangResources = (lang: string) => ({\n   translation: {\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n"
+                },
+                {
+                    "date": 1727233428425,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,9 +22,9 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((acc: any, value: string) => {\n+const resources = languages.reduce((acc: any, langObj: Language)) => {\n   // 获取项目名称\n   acc[value] = loadLangResources(value)\n   return acc\n }, {})\n"
+                },
+                {
+                    "date": 1727233437257,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,9 +22,9 @@\n   },\n })\n \n // Automatically generate the resources object\n-const resources = languages.reduce((acc: any, langObj: Language)) => {\n+const resources = languages.reduce((acc: any, langObj: Language) => {\n   // 获取项目名称\n   acc[value] = loadLangResources(value)\n   return acc\n }, {})\n"
+                },
+                {
+                    "date": 1727233448712,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,10 @@\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n-  // 获取项目名称\n+  const lang = langObj.value;\n+\n   acc[value] = loadLangResources(value)\n   return acc\n }, {})\n \n"
+                },
+                {
+                    "date": 1727233455443,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,10 +24,9 @@\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n   const lang = langObj.value;\n-\n-  acc[value] = loadLangResources(value)\n+  acc[lang] = loadLangResources(value)\n   return acc\n }, {})\n \n i18n.use(initReactI18next)\n"
+                },
+                {
+                    "date": 1727233660871,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,9 +24,9 @@\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n   const lang = langObj.value;\n-  acc[lang] = loadLangResources(value)\n+  acc[lang] = loadLangResources(lang)\n   return acc\n }, {})\n \n i18n.use(initReactI18next)\n"
+                },
+                {
+                    "date": 1727235874565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,8 +32,9 @@\n i18n.use(initReactI18next)\n   .init({\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n-    resources,\n+    ns: ['common', 'layout', 'dintal'], // 指定命名空间列表\n+    defaultNS: 'common', // 设置默认命名空间    resources,\n   })\n \n export default i18n\n"
+                },
+                {
+                    "date": 1727235935779,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,8 @@\n \n export const languages: Language[] = data.languages\n \n const loadLangResources = (lang: string) => ({\n-  translation: {\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n   },\n"
+                },
+                {
+                    "date": 1727236300970,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,39 @@\n+'use client'\n+import i18n from 'i18next'\n+import { initReactI18next } from 'react-i18next'\n+\n+import data from './languages.json'\n+\n+interface Language {\n+  value: string;\n+  name: string;\n+  prompt_name: string;\n+  example: string;\n+  supported: boolean;\n+}\n+\n+export const languages: Language[] = data.languages\n+\n+const loadLangResources = (lang: string) => ({\n+    common: require(`./${lang}/common`).default,\n+    layout: require(`./${lang}/layout`).default,\n+    dintal: require(`./${lang}/dintal`).default,\n+})\n+\n+// Automatically generate the resources object\n+const resources = languages.reduce((acc: any, langObj: Language) => {\n+  const lang = langObj.value;\n+  acc[lang] = loadLangResources(lang)\n+  return acc\n+}, {})\n+\n+i18n.use(initReactI18next)\n+  .init({\n+    lng: 'zh-Hans',\n+    fallbackLng: 'zh-Hans',\n+    ns: ['common', 'layout', 'dintal'], // 指定命名空间列表\n+    defaultNS: 'common', // 设置默认命名空间\n+    resources,\n+  })\n+\n+export default i18n\n"
+                },
+                {
+                    "date": 1727236319526,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,45 +34,6 @@\n     ns: ['common', 'layout', 'dintal'], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n     resources,\n   })\n-\n+de\n export default i18n\n-'use client'\n-import i18n from 'i18next'\n-import { initReactI18next } from 'react-i18next'\n-\n-import data from './languages.json'\n-\n-interface Language {\n-  value: string;\n-  name: string;\n-  prompt_name: string;\n-  example: string;\n-  supported: boolean;\n-}\n-\n-export const languages: Language[] = data.languages\n-\n-const loadLangResources = (lang: string) => ({\n-    common: require(`./${lang}/common`).default,\n-    layout: require(`./${lang}/layout`).default,\n-    dintal: require(`./${lang}/dintal`).default,\n-  },\n-})\n-\n-// Automatically generate the resources object\n-const resources = languages.reduce((acc: any, langObj: Language) => {\n-  const lang = langObj.value;\n-  acc[lang] = loadLangResources(lang)\n-  return acc\n-}, {})\n-\n-i18n.use(initReactI18next)\n-  .init({\n-    lng: 'zh-Hans',\n-    fallbackLng: 'zh-Hans',\n-    ns: ['common', 'layout', 'dintal'], // 指定命名空间列表\n-    defaultNS: 'common', // 设置默认命名空间    resources,\n-  })\n-\n-export default i18n\n"
+                },
+                {
+                    "date": 1727239096176,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,6 +34,6 @@\n     ns: ['common', 'layout', 'dintal'], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n     resources,\n   })\n-de\n+\n export default i18n\n"
+                },
+                {
+                    "date": 1727239481216,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,4 @@\n-'use client'\n import i18n from 'i18next'\n import { initReactI18next } from 'react-i18next'\n \n import data from './languages.json'\n"
+                },
+                {
+                    "date": 1727240533727,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,8 +16,9 @@\n const loadLangResources = (lang: string) => ({\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n+    ...require(`./${lang}/introduction`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727240542547,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,9 @@\n const loadLangResources = (lang: string) => ({\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n-    ...require(`./${lang}/introduction`).default,\n+    i...require(`./${lang}/introduction`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727240549598,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,9 @@\n const loadLangResources = (lang: string) => ({\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n-    i...require(`./${lang}/introduction`).default,\n+    小怪物： require(`./${lang}/introduction`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727240557303,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,9 @@\n const loadLangResources = (lang: string) => ({\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n-    小怪物： require(`./${lang}/introduction`).default,\n+    intr： require(`./${lang}/introduction`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727240578475,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n import i18n from 'i18next'\n import { initReactI18next } from 'react-i18next'\n \n import data from './languages.json'\n+import Introduction from '@/app/components/Introduction';\n \n interface Language {\n   value: string;\n   name: string;\n@@ -16,9 +17,9 @@\n const loadLangResources = (lang: string) => ({\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n-    intr： require(`./${lang}/introduction`).default,\n+    Introduction： require(`./${lang}/introduction`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n@@ -30,9 +31,9 @@\n i18n.use(initReactI18next)\n   .init({\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n-    ns: ['common', 'layout', 'dintal'], // 指定命名空间列表\n+    ns: ['common', 'layout', 'dintal', 'Introduction：'], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n     resources,\n   })\n \n"
+                },
+                {
+                    "date": 1727240593599,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -31,9 +31,9 @@\n i18n.use(initReactI18next)\n   .init({\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n-    ns: ['common', 'layout', 'dintal', 'Introduction：'], // 指定命名空间列表\n+    ns: ['common', 'layout', 'dintal', 'introduction'], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n     resources,\n   })\n \n"
+                },
+                {
+                    "date": 1727240601870,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n const loadLangResources = (lang: string) => ({\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n-    Introduction： require(`./${lang}/introduction`).default,\n+    introduction: require(`./${lang}/introduction`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727240648555,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,8 +33,11 @@\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n     ns: ['common', 'layout', 'dintal', 'introduction'], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n-    resources,\n+    resources,,\n+    interpolation: {\n+      escapeValue: false,\n+    },\n   })\n \n export default i18n\n"
+                },
+                {
+                    "date": 1727241162457,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,8 +18,9 @@\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n     introduction: require(`./${lang}/introduction`).default,\n+    \n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n@@ -33,9 +34,9 @@\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n     ns: ['common', 'layout', 'dintal', 'introduction'], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n-    resources,,\n+    resources,\n     interpolation: {\n       escapeValue: false,\n     },\n   })\n"
+                },
+                {
+                    "date": 1727241168111,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n     introduction: require(`./${lang}/introduction`).default,\n-    \n+    graphViewer\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727241175340,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n     introduction: require(`./${lang}/introduction`).default,\n-    graphViewer\n+    graphViewer:  require(`./${lang}/introduction`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727241182588,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n     common: require(`./${lang}/common`).default,\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n     introduction: require(`./${lang}/introduction`).default,\n-    graphViewer:  require(`./${lang}/introduction`).default,\n+    graphViewer:  require(`./${lang}/graphViewer`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727241190609,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,9 @@\n i18n.use(initReactI18next)\n   .init({\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n-    ns: ['common', 'layout', 'dintal', 'introduction'], // 指定命名空间列表\n+    ns: ['common', 'layout', 'dintal', 'introduction', 'graphViewer'], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n     resources,\n     interpolation: {\n       escapeValue: false,\n"
+                },
+                {
+                    "date": 1727249974174,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,9 @@\n i18n.use(initReactI18next)\n   .init({\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n-    ns: ['common', 'layout', 'dintal', 'introduction', 'graphViewer'], // 指定命名空间列表\n+    ns: ['common', 'layout', 'dintal', 'introduction', 'graphViewer, '], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n     resources,\n     interpolation: {\n       escapeValue: false,\n"
+                },
+                {
+                    "date": 1727249980372,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,9 @@\n i18n.use(initReactI18next)\n   .init({\n     lng: 'zh-Hans',\n     fallbackLng: 'zh-Hans',\n-    ns: ['common', 'layout', 'dintal', 'introduction', 'graphViewer, '], // 指定命名空间列表\n+    ns: ['common', 'layout', 'dintal', 'introduction', 'graphViewer', 'dataview'], // 指定命名空间列表\n     defaultNS: 'common', // 设置默认命名空间\n     resources,\n     interpolation: {\n       escapeValue: false,\n"
+                },
+                {
+                    "date": 1727249988013,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,8 +19,9 @@\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n     introduction: require(`./${lang}/introduction`).default,\n     graphViewer:  require(`./${lang}/graphViewer`).default,\n+    graphViewer:  require(`./${lang}/graphViewer`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727249994207,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n     introduction: require(`./${lang}/introduction`).default,\n     graphViewer:  require(`./${lang}/graphViewer`).default,\n-    graphViewer:  require(`./${lang}/graphViewer`).default,\n+    graphViewer:  require(`./${lang}/dataViewer`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                },
+                {
+                    "date": 1727250002661,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n     layout: require(`./${lang}/layout`).default,\n     dintal: require(`./${lang}/dintal`).default,\n     introduction: require(`./${lang}/introduction`).default,\n     graphViewer:  require(`./${lang}/graphViewer`).default,\n-    graphViewer:  require(`./${lang}/dataViewer`).default,\n+    dataview:  require(`./${lang}/dataview`).default,\n })\n \n // Automatically generate the resources object\n const resources = languages.reduce((acc: any, langObj: Language) => {\n"
+                }
+            ],
+            "date": 1727233387390,
+            "name": "Commit-0",
+            "content": "'use client'\nimport i18n from 'i18next'\nimport { initReactI18next } from 'react-i18next'\n\nimport data from './languages.json'\n\nexport const languages = data.languages\ninterface Language {\n  value: string;\n  name: string;\n  prompt_name: string;\n  example: string;\n  supported: boolean;\n}\n\nconst loadLangResources = (lang: string) => ({\n  translation: {\n    common: require(`./${lang}/common`).default,\n    layout: require(`./${lang}/layout`).default,\n    dintal: require(`./${lang}/dintal`).default,\n  },\n})\n\n// Automatically generate the resources object\nconst resources = languages.reduce((acc: any, value: string) => {\n  // 获取项目名称\n  acc[value] = loadLangResources(value)\n  return acc\n}, {})\n\ni18n.use(initReactI18next)\n  .init({\n    lng: 'zh-Hans',\n    fallbackLng: 'zh-Hans',\n    resources,\n  })\n\nexport default i18n\n"
+        }
+    ]
+}
