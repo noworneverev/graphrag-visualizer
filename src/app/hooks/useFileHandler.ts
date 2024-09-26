@@ -6,7 +6,7 @@ import { TextUnit } from "../models/text-unit";
 import { Community } from "../models/community";
 import { CommunityReport } from "../models/community-report";
 import { Covariate } from "../models/covariate";
-import { readParquetFile } from "../utils/parquet-utils";
+import { readParquetFile, readParquetBuffer } from "../utils/parquet-utils";
 
 const fileSchemas: { [key: string]: string } = {
   "create_final_entities.parquet": "entity",
@@ -27,7 +27,7 @@ const useFileHandler = () => {
   const [covariates, setCovariates] = useState<Covariate[]>([]);
   const [communityReports, setCommunityReports] = useState<CommunityReport[]>([]);
 
-  const handleFilesRead = async (files: File[]) => {
+  const handleFilesRead = async (files: File[] |  { name: string, buffer: ArrayBuffer}[]) => {
     const entitiesArray: Entity[][] = [];
     const relationshipsArray: Relationship[][] = [];
     const documentsArray: Document[][] = [];
@@ -35,10 +35,14 @@ const useFileHandler = () => {
     const communitiesArray: Community[][] = [];
     const communityReportsArray: CommunityReport[][] = [];
     const covariatesArray: Covariate[][] = [];
-
     for (const file of files) {
       const schema = fileSchemas[file.name];
-      const data = await readParquetFile(file, schema);
+      let data = [];
+      if (file instanceof File) {
+        data = await readParquetFile(file, schema);
+      } else if (file.buffer instanceof ArrayBuffer) {
+        data = await readParquetBuffer(file.buffer, schema);
+      }
 
       if (schema === "entity") {
         entitiesArray.push(data);

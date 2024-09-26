@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 const App: React.FC = () => {
   const { t } = useTranslation('layout');
   const [darkMode, setDarkMode] = useState(true);
+  const [categary, setCategary] = useState<string | null>(null);
   const paletteType = darkMode ? "dark" : "light";
 
   const theme = createTheme({
@@ -57,6 +58,13 @@ const App: React.FC = () => {
   useEffect(() => {
     const currentTheme = localStorage.getItem("theme");
     setDarkMode(currentTheme === "dark");
+
+    // 获取 URL 中的 categary 参数
+    const queryParams = new URLSearchParams(window?.location?.search);
+    const categaryParam = queryParams.get('categary');
+    if (categaryParam) {
+      setCategary(categaryParam);
+    }
   }, []);
 
   return (
@@ -100,7 +108,7 @@ const App: React.FC = () => {
             </Tooltip>
           )}
         </Box>
-        <GraphDataHandler />
+        <GraphDataHandler  categary={categary} />
       </Container>
     </ThemeProvider>
   );

@@ -106,7 +106,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   const [linkedRelationships, setLinkedRelationships] = useState<CustomLink[]>(
     []
   );
-  const [showLabels, setShowLabels] = useState(false);
+  const [showLabels, setShowLabels] = useState(true);
   const [showLinkLabels, setShowLinkLabels] = useState(false);
   const [showHighlight, setShowHighlight] = useState(true);
   const graphRef = useRef<any>();

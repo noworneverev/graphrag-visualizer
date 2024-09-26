@@ -10,6 +10,10 @@ services:
       - "3004:3004"
     environment:
       NODE_ENV: development
+      MINIO_ACCESS_KEY: minio // 设置环境变量或直接传值
+      MINIO_SECRET_KEY: minio@123
+      MINIO_ENDPOINT: http://192.168.1.182:9080 // Minio 的 S3 兼容地址
+
     volumes:
       - /opt/dintal/work/graphrag-visualizer:/app/graphrag-visualizer/data
     networks:
