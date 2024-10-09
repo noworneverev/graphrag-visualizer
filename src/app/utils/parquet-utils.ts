@@ -31,10 +31,19 @@ const parseValue = (value: any, type: 'number' | 'bigint'): any => {
   }
   return type === 'bigint' ? BigInt(value) : Number(value);
 };
-
 export const readParquetFile = async (file: File, schema?: string): Promise<any[]> => {
   try {
     const arrayBuffer = await file.arrayBuffer();
+    return readParquetBuffer(arrayBuffer, schema)
+  }catch (err) {
+    console.error("Error reading Parquet file", err);
+    return [];
+  }
+}
+
+export const readParquetBuffer = async (arrayBuffer: ArrayBuffer, schema?: string): Promise<any[]> => {
+
+  try {
     const asyncBuffer = new AsyncBuffer(arrayBuffer);
 
     return new Promise((resolve, reject) => {

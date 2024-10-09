@@ -46,3 +46,20 @@ The logic for creating relationships for text units, documents, communities, and
 | Text Unit   | `HAS_COVARIATE` | Covariate |
 | Community   | `HAS_FINDING` | Finding     |
 | Entity      | `IN_COMMUNITY` | Community  |
+
+
+##
+
+
+```bash
+
+docker compose build
+
+docker compose up -d
+
+images=$(grep 'image:' docker-compose.yml | awk '{print $2}')
+
+docker save -o graphrag-visualizer.tar $images
+
+
+```

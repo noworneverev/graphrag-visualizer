@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useTranslation } from 'react-i18next';
 
 interface DropZoneProps {
   getRootProps: () => any;
@@ -13,6 +14,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   getInputProps,
   isDragActive,
 }) => {
+  const { t } = useTranslation('layout');
   const theme = useTheme();
 
   return (
@@ -38,10 +40,10 @@ const DropZone: React.FC<DropZoneProps> = ({
     >
       <input {...getInputProps()} {...({ webkitdirectory: "true" } as any)} />
       {isDragActive ? (
-        <Typography variant="body1">Drop the files here...</Typography>
+        <Typography variant="body1">{t('dropZone.dropFilesHere')}</Typography>
       ) : (
         <Typography variant="body1">
-          Drag 'n' drop parquet files here, or click to select files
+          {t('dropZone.dragAndDrop')}
         </Typography>
       )}
     </Box>
