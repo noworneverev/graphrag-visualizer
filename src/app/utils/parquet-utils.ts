@@ -87,9 +87,9 @@ export const readParquetFile = async (file: File, schema?: string): Promise<any[
               id: row[0],
               title: row[1],
               level: parseValue(row[2], 'number'),
-              raw_community: parseValue(row[3], 'number'),
-              relationship_ids: row[4],
-              text_unit_ids: row[5],
+              ...(row.length > 5 ? { raw_community: parseValue(row[3], 'number') } : {}), // From graphrag 0.3.X onwards, raw_community is removed
+              relationship_ids: row[row.length > 5 ? 4 : 3],
+              text_unit_ids: row[row.length > 5 ? 5 : 4],              
             })));
           } else if (schema === 'community_report') {
             resolve(rows.map(row => ({
