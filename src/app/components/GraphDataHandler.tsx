@@ -36,6 +36,7 @@ const GraphDataHandler: React.FC = () => {
     covariates,
     communityReports,
     handleFilesRead,
+    loadDefaultFiles,
   } = useFileHandler();
 
   const graphData = useGraphData(
@@ -56,6 +57,12 @@ const GraphDataHandler: React.FC = () => {
   const hasTextUnits = textunits.length > 0;
   const hasCommunities = communities.length > 0;
   const hasCovariates = covariates.length > 0;
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      loadDefaultFiles();
+    }
+  }, []);
 
   useEffect(() => {
     if (entities.length > 0) {
