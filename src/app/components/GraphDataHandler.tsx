@@ -62,6 +62,7 @@ const GraphDataHandler: React.FC = () => {
     if (process.env.NODE_ENV === "development") {
       loadDefaultFiles();
     }
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {

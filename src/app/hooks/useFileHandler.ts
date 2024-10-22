@@ -122,9 +122,9 @@ const useFileHandler = () => {
           console.log(`File exists: ${filePath}`);
           return true;
         } else {
-          console.warn(
-            `File does not exist or incorrect type: ${filePath} (Content-Type: ${contentType})`
-          );
+          // console.warn(
+          //   `File does not exist or incorrect type: ${filePath} (Content-Type: ${contentType})`
+          // );
           return false;
         }
       } else {
