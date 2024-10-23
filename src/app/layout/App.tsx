@@ -79,7 +79,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router>
+      <Router basename="/graphrag-visualizer">
         <Container disableGutters maxWidth={false}>
           <CssBaseline />
 
