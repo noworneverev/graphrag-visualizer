@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -79,7 +79,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router basename="/graphrag-visualizer">
+      <Router>
         <Container disableGutters maxWidth={false}>
           <CssBaseline />
 
@@ -120,18 +120,11 @@ const App: React.FC = () => {
             )}
           </Box>
           <Routes>
-            {" "}
-            {/* **Added Routes** */}
             <Route path="/" element={<Navigate to="/upload" replace />} />{" "}
-            {/* **Redirect Root to /upload** */}
             <Route path="/upload" element={<GraphDataHandler />} />{" "}
-            {/* **Upload Tab** */}
             <Route path="/graph" element={<GraphDataHandler />} />{" "}
-            {/* **Graph Visualization Tab** */}
             <Route path="/data" element={<GraphDataHandler />} />{" "}
-            {/* **Data Tables Tab** */}
             <Route path="*" element={<Navigate to="/upload" replace />} />{" "}
-            {/* **Catch-All Redirect** */}
           </Routes>
 
           {/* <GraphDataHandler /> */}
