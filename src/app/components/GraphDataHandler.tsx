@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import GraphViewer from "./GraphViewer";
 import { Box, Container, Tab, Tabs } from "@mui/material";
 import { useDropzone } from "react-dropzone";
@@ -10,6 +11,9 @@ import DataTableContainer from "./DataTableContainer";
 import ReactGA from "react-ga4";
 
 const GraphDataHandler: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [tabIndex, setTabIndex] = useState(0);
   const [graphType, setGraphType] = useState<"2d" | "3d">("2d");
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -66,12 +70,6 @@ const GraphDataHandler: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (entities.length > 0) {
-      setTabIndex(1);
-    }
-  }, [entities]);
-
-  useEffect(() => {
     const measurementId = process.env.REACT_APP_GA_MEASUREMENT_ID;
     if (measurementId) {
       ReactGA.initialize(measurementId);
@@ -80,8 +78,26 @@ const GraphDataHandler: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    // **Set tab index based on the current path**
+    switch (location.pathname) {
+      case "/upload":
+        setTabIndex(0);
+        break;
+      case "/graph":
+        setTabIndex(1);
+        break;
+      case "/data":
+        setTabIndex(2);
+        break;
+      default:
+        setTabIndex(0);
+    }
+  }, [location.pathname]);
+
   const onDrop = (acceptedFiles: File[]) => {
     handleFilesRead(acceptedFiles);
+    navigate("/graph", { replace: true });
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -95,6 +111,10 @@ const GraphDataHandler: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
+    let path = "/upload";
+    if (newValue === 1) path = "/graph";
+    if (newValue === 2) path = "/data";
+    navigate(path);
     ReactGA.send({
       hitType: "event",
       eventCategory: "Tabs",

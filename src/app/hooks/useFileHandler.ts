@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Entity } from "../models/entity";
 import { Relationship } from "../models/relationship";
 import { Document } from "../models/document";
@@ -30,6 +31,7 @@ const fileSchemas: { [key: string]: string } = {
 };
 
 const useFileHandler = () => {
+  const navigate = useNavigate();
   const [entities, setEntities] = useState<Entity[]>([]);
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -150,6 +152,7 @@ const useFileHandler = () => {
     }
     if (filesToLoad.length > 0) {
       await loadFiles(filesToLoad);
+      navigate("/graph", { replace: true });
     } else {
       console.log("No default files found in the public folder.");
     }
