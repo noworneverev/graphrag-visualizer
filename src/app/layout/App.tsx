@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -22,6 +22,9 @@ import {
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import GitHubIcon from "@mui/icons-material/GitHub";
+
+const basename =
+  process.env.NODE_ENV === "development" ? "" : "/graphrag-visualizer";
 
 const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(true);
@@ -79,7 +82,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router basename="/graphrag-visualizer">
+      <Router basename={basename}>
         <Container disableGutters maxWidth={false}>
           <CssBaseline />
 
@@ -120,18 +123,11 @@ const App: React.FC = () => {
             )}
           </Box>
           <Routes>
-            {" "}
-            {/* **Added Routes** */}
             <Route path="/" element={<Navigate to="/upload" replace />} />{" "}
-            {/* **Redirect Root to /upload** */}
             <Route path="/upload" element={<GraphDataHandler />} />{" "}
-            {/* **Upload Tab** */}
             <Route path="/graph" element={<GraphDataHandler />} />{" "}
-            {/* **Graph Visualization Tab** */}
             <Route path="/data" element={<GraphDataHandler />} />{" "}
-            {/* **Data Tables Tab** */}
             <Route path="*" element={<Navigate to="/upload" replace />} />{" "}
-            {/* **Catch-All Redirect** */}
           </Routes>
 
           {/* <GraphDataHandler /> */}
