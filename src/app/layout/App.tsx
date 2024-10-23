@@ -1,4 +1,10 @@
 import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import ReactGA from "react-ga4";
 
 import GraphDataHandler from "../components/GraphDataHandler";
@@ -73,47 +79,64 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container disableGutters maxWidth={false}>
-        <CssBaseline />
+      <Router>
+        <Container disableGutters maxWidth={false}>
+          <CssBaseline />
 
-        <Box
-          sx={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            zIndex: 1000,
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            alignItems: "center",
-            gap: 1,
-            padding: { xs: "20px 0px", sm: "0" },
-          }}
-        >
-          <IconButton
-            component={Link}
-            href="https://github.com/noworneverev/graphrag-visualizer"
-            target="_blank"
-            rel="noopener"
-            color="inherit"
+          <Box
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              zIndex: 1000,
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: "center",
+              gap: 1,
+              padding: { xs: "20px 0px", sm: "0" },
+            }}
           >
-            <GitHubIcon />
-          </IconButton>
-          {darkMode ? (
-            <Tooltip title="Turn on the light">
-              <IconButton onClick={handleThemeChange} color="inherit">
-                <DarkModeOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <Tooltip title="Turn off the light">
-              <IconButton onClick={handleThemeChange} color="inherit">
-                <LightModeOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
-        <GraphDataHandler />
-      </Container>
+            <IconButton
+              component={Link}
+              href="https://github.com/noworneverev/graphrag-visualizer"
+              target="_blank"
+              rel="noopener"
+              color="inherit"
+            >
+              <GitHubIcon />
+            </IconButton>
+            {darkMode ? (
+              <Tooltip title="Turn on the light">
+                <IconButton onClick={handleThemeChange} color="inherit">
+                  <DarkModeOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Turn off the light">
+                <IconButton onClick={handleThemeChange} color="inherit">
+                  <LightModeOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+          <Routes>
+            {" "}
+            {/* **Added Routes** */}
+            <Route path="/" element={<Navigate to="/upload" replace />} />{" "}
+            {/* **Redirect Root to /upload** */}
+            <Route path="/upload" element={<GraphDataHandler />} />{" "}
+            {/* **Upload Tab** */}
+            <Route path="/graph" element={<GraphDataHandler />} />{" "}
+            {/* **Graph Visualization Tab** */}
+            <Route path="/data" element={<GraphDataHandler />} />{" "}
+            {/* **Data Tables Tab** */}
+            <Route path="*" element={<Navigate to="/upload" replace />} />{" "}
+            {/* **Catch-All Redirect** */}
+          </Routes>
+
+          {/* <GraphDataHandler /> */}
+        </Container>
+      </Router>
     </ThemeProvider>
   );
 };
