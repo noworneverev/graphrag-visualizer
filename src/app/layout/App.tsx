@@ -23,9 +23,6 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import GitHubIcon from "@mui/icons-material/GitHub";
 
-const basename =
-  process.env.NODE_ENV === "development" ? "" : "/graphrag-visualizer";
-
 const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(true);
   const paletteType = darkMode ? "dark" : "light";
@@ -82,7 +79,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router basename={basename}>
+      <Router>
         <Container disableGutters maxWidth={false}>
           <CssBaseline />
 
