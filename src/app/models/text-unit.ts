@@ -2,6 +2,7 @@ import { MRT_ColumnDef } from "material-react-table";
 
 export interface TextUnit {
     id: string;
+    human_readable_id: number;
     text: string;
     n_tokens: number;
     document_ids: string[];
@@ -12,19 +13,19 @@ export interface TextUnit {
 export const textUnitColumns: MRT_ColumnDef<TextUnit>[] = [
     {
       accessorKey: "id",
-      header: "ID",
+      header: "id",
     },
     {
       accessorKey: "text",
-      header: "Text",
+      header: "text",
     },
     {
       accessorKey: "n_tokens",
-      header: "Number of Tokens",
+      header: "n_tokens",
     },
     {
       accessorKey: "document_ids",
-      header: "Document IDs",
+      header: "document_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -32,7 +33,7 @@ export const textUnitColumns: MRT_ColumnDef<TextUnit>[] = [
     },
     {
       accessorKey: "entity_ids",
-      header: "Entity IDs",
+      header: "entity_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -40,7 +41,7 @@ export const textUnitColumns: MRT_ColumnDef<TextUnit>[] = [
     },
     {
       accessorKey: "relationship_ids",
-      header: "Relationship IDs",
+      header: "relationship_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)

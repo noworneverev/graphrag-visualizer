@@ -20,6 +20,18 @@ const Introduction: React.FC = () => {
         Welcome to the GraphRAG Visualizer
       </Typography>
 
+      <Typography variant="body1" gutterBottom sx={{ color: "error.main" }}>
+        If you are using <strong>GraphRAG 0.3.x or below</strong>, please visit
+        the legacy site:{" "}
+        <Link
+          href="https://noworneverev.github.io/graphrag-visualizer-legacy"
+          target="_blank"
+          rel="noopener"
+        >
+          GraphRAG Visualizer Legacy
+        </Link>
+      </Typography>
+
       <Typography variant="h6" gutterBottom>
         Overview
       </Typography>

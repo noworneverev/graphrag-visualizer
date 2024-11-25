@@ -6,87 +6,62 @@ export interface Covariate {
     covariate_type: string;
     type: string;
     description: string;
-    subject_id: string;
-    subject_type: string;
-    object_id: string;
-    object_type: string;
+    subject_id: string;    
+    object_id: string;    
     status: string;
     start_date: string;
     end_date: string;
     source_text: string;
-    text_unit_id: string;
-    document_ids: string[];
-    n_tokens: number;
+    text_unit_id: string;    
 }
 
 export const covariateColumns: MRT_ColumnDef<Covariate>[] = [
     {
       accessorKey: "id",
-      header: "ID",
+      header: "id",
     },
     {
       accessorKey: "human_readable_id",
-      header: "Human Readable ID",
+      header: "human_readable_id",
     },
     {
       accessorKey: "covariate_type",
-      header: "Covariate Type",
+      header: "covariate_type",
     },
     {
       accessorKey: "type",
-      header: "Type",
+      header: "type",
     },
     {
       accessorKey: "description",
-      header: "Description",
+      header: "description",
     },
     {
       accessorKey: "subject_id",
-      header: "Subject ID",
-    },
-    {
-      accessorKey: "subject_type",
-      header: "Subject Type",
-    },
+      header: "subject_id",
+    },    
     {
       accessorKey: "object_id",
-      header: "Object ID",
-    },
-    {
-      accessorKey: "object_type",
-      header: "Object Type",
-    },
+      header: "object_id",
+    },    
     {
       accessorKey: "status",
-      header: "Status",
+      header: "status",
     },
     {
       accessorKey: "start_date",
-      header: "Start Date",
+      header: "start_date",
     },
     {
       accessorKey: "end_date",
-      header: "End Date",
+      header: "end_date",
     },
     {
       accessorKey: "source_text",
-      header: "Source Text",
+      header: "source_text",
     },
     {
       accessorKey: "text_unit_id",
-      header: "Text Unit ID",
-    },
-    {
-      accessorKey: "document_ids",
-      header: "Document IDs",
-      Cell: ({ renderedCellValue }) =>
-        Array.isArray(renderedCellValue)
-          ? JSON.stringify(renderedCellValue, null, 2)
-          : renderedCellValue,
-    },
-    {
-      accessorKey: "n_tokens",
-      header: "Number of Tokens",
-    },
-    
+      header: "text_unit_id",
+    },        
   ];

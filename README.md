@@ -9,6 +9,11 @@
 
 GraphRAG Visualizer is an application designed to visualize Microsoft [GraphRAG](https://github.com/microsoft/graphrag) artifacts. By uploading parquet files generated from the GraphRAG indexing pipeline, users can easily view and analyze data without needing additional software or scripts.
 
+## Important Note
+
+If you are using **GraphRAG 0.3.x or below**, please use the legacy version of GraphRAG Visualizer available at:  
+👉 [GraphRAG Visualizer Legacy](https://noworneverev.github.io/graphrag-visualizer-legacy)
+
 ## Features
 
 - **Graph Visualization**: View the graph in 2D or 3D in the "Graph Visualization" tab.

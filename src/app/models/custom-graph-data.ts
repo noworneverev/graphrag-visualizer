@@ -52,6 +52,7 @@ export interface CustomLink extends LinkObject {
     text_unit_ids?: string[];
     id: string;
     human_readable_id?: number;
+    combined_degree?: number;
     source_degree?: number;
     target_degree?: number;
     rank?: number;
