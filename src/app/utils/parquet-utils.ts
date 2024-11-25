@@ -39,80 +39,83 @@ export const readParquetFile = async (
             resolve(
               rows.map((row) => ({
                 id: row[0],
-                name: row[1],
-                type: row[2],
-                description: row[3],
-                human_readable_id: parseValue(row[4], "number"),
-                graph_embedding: row[5],
-                text_unit_ids: row[6],
-                description_embedding: row[7],
+                human_readable_id: parseValue(row[1], "number"),
+                title: row[2],
+                type: row[3],
+                description: row[4],                                
+                text_unit_ids: row[5],                
               }))
             );
           } else if (schema === "relationship") {
             resolve(
               rows.map((row) => ({
-                source: row[0],
-                target: row[1],
-                type: "RELATED", // Custom field to match neo4j
-                weight: row[2],
-                description: row[3],
-                text_unit_ids: row[4],
-                id: row[5],
-                human_readable_id: parseValue(row[6], "number"),
-                source_degree: parseValue(row[7], "number"),
-                target_degree: parseValue(row[8], "number"),
-                rank: parseValue(row[9], "number"),
+                id: row[0],
+                human_readable_id: parseValue(row[1], "number"),
+                source: row[2],
+                target: row[3],
+                description: row[4],
+                weight: row[5],
+                combined_degree: parseValue(row[6], "number"),
+                text_unit_ids: row[7],
+                type: "RELATED", // Custom field to match neo4j                
               }))
             );
           } else if (schema === "document") {
             resolve(
               rows.map((row) => ({
                 id: row[0],
-                text_unit_ids: row[1],
-                raw_content: row[2],
-                title: row[3],
+                human_readable_id: parseValue(row[1], "number"),
+                title: row[2],
+                text: row[3],
+                text_unit_ids: row[4],                
               }))
             );
           } else if (schema === "text_unit") {
             resolve(
               rows.map((row) => ({
                 id: row[0],
-                text: row[1],
-                n_tokens: parseValue(row[2], "number"),
-                document_ids: row[3],
-                entity_ids: row[4],
-                relationship_ids: row[5],
+                human_readable_id: parseValue(row[1], "number"),
+                text: row[2],
+                n_tokens: parseValue(row[3], "number"),
+                document_ids: row[4],
+                entity_ids: row[5],
+                relationship_ids: row[6],
               }))
             );
           } else if (schema === "community") {
             resolve(
               rows.map((row) => ({
                 id: row[0],
-                title: row[1],
-                level: parseValue(row[2], "number"),
-                ...(row.length > 5
-                  ? { raw_community: parseValue(row[3], "number") }
-                  : {}), // From graphrag 0.3.X onwards, raw_community is removed
-                relationship_ids: row[row.length > 5 ? 4 : 3],
-                text_unit_ids: row[row.length > 5 ? 5 : 4],
+                human_readable_id: parseValue(row[1], "number"),
+                community: parseValue(row[2], "number"),
+                level: parseValue(row[3], "number"),
+                title: row[4],
+                entity_ids: row[5],
+                relationship_ids: row[6],
+                text_unit_ids: row[7],
+                period: row[8],
+                size: parseValue(row[9], "number"),
               }))
             );
           } else if (schema === "community_report") {
             resolve(
               rows.map((row) => ({
-                community: parseValue(row[0], "number"),
-                full_content: row[1],
-                level: parseValue(row[2], "number"),
-                rank: parseValue(row[3], "number"),
+                id: row[0],
+                human_readable_id: parseValue(row[1], "number"),
+                community: parseValue(row[2], "number"),
+                level: parseValue(row[3], "number"),
                 title: row[4],
-                rank_explanation: row[5],
-                summary: row[6],
-                findings: row[7].map((finding: any) => ({
+                summary: row[5],
+                full_content: row[6],
+                rank: parseValue(row[7], "number"),                
+                rank_explanation: row[8],                
+                findings: row[9].map((finding: any) => ({
                   explanation: finding.explanation,
                   summary: finding.summary,
                 })),
-                full_content_json: row[8],
-                id: row[9],
+                full_content_json: row[10],  
+                period: row[11],
+                size: parseValue(row[12], "number"),              
               }))
             );
           } else if (schema === "covariate") {
@@ -123,17 +126,13 @@ export const readParquetFile = async (
                 covariate_type: row[2],
                 type: row[3],
                 description: row[4],
-                subject_id: row[5],
-                subject_type: row[6],
-                object_id: row[7],
-                object_type: row[8],
-                status: row[9],
-                start_date: row[10],
-                end_date: row[11],
-                source_text: row[12],
-                text_unit_id: row[13],
-                document_ids: row[14],
-                n_tokens: parseValue(row[15], "number"),
+                subject_id: row[5],                
+                object_id: row[6],                
+                status: row[7],
+                start_date: row[8],
+                end_date: row[9],
+                source_text: row[10],
+                text_unit_id: row[11],                
               }))
             );
           } else {

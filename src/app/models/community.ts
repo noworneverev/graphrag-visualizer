@@ -2,33 +2,49 @@ import { MRT_ColumnDef } from "material-react-table";
 
 export interface Community {
     id: number;
-    title: string;
+    human_readable_id: number;
+    community: number;
     level: number;
-    raw_community: number;
+    title: string;    
+    entity_ids: string[];
     relationship_ids: string[];
     text_unit_ids: string[];
+    period: string;
+    size: number;
 }
 
 export const communityColumns: MRT_ColumnDef<Community>[] = [
     {
       accessorKey: "id",
-      header: "ID",
+      header: "id",
     },
     {
-      accessorKey: "title",
-      header: "Title",
+      accessorKey: "human_readable_id",
+      header: "human_readable_id",
+    },
+    {
+      accessorKey: "community",
+      header: "community",
     },
     {
       accessorKey: "level",
-      header: "Level",
+      header: "level",
     },
     {
-      accessorKey: "raw_community",
-      header: "Raw Community",
+      accessorKey: "title",
+      header: "title",
+    },
+    {
+      accessorKey: "entity_ids",
+      header: "entity_ids",
+      Cell: ({ renderedCellValue }) =>
+        Array.isArray(renderedCellValue)
+          ? JSON.stringify(renderedCellValue, null, 2)
+          : renderedCellValue,
     },
     {
       accessorKey: "relationship_ids",
-      header: "Relationship IDs",
+      header: "relationship_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -36,10 +52,18 @@ export const communityColumns: MRT_ColumnDef<Community>[] = [
     },
     {
       accessorKey: "text_unit_ids",
-      header: "Text Unit IDs",
+      header: "text_unit_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
           : renderedCellValue,
+    },
+    {
+      accessorKey: "period",
+      header: "period",
+    },
+    {
+      accessorKey: "size",
+      header: "size",
     },
   ];

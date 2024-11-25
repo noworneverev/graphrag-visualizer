@@ -6,66 +6,77 @@ export interface Finding {
 }
 
 export interface CommunityReport {
+    id: string;
+    human_readable_id: number;
     community: number;
-    full_content: string;
     level: number;
-    rank: number;
     title: string;
-    rank_explanation: string;
     summary: string;
+    full_content: string;
+    rank: number;
+    rank_explanation: string;
     findings: Finding[];
     full_content_json: string;
-    id: string;
+    period: string;
+    size: number;
 }
 
 export const findingColumns: MRT_ColumnDef<Finding>[] = [
   {
     accessorKey: "id",
-    header: "ID",
+    header: "id",
   },
   {
     accessorKey: "explanation",
-    header: "Explanation",
+    header: "explanation",
   },
   {
     accessorKey: "summary",
-    header: "Summary",
+    header: "summary",
   },
 
 ]
 
 export const communityReportColumns: MRT_ColumnDef<CommunityReport>[] = [
     {
-      accessorKey: "community",
-      header: "Community",
+      accessorKey: "id",
+      header: "id",
+    },  
+    {
+      accessorKey: "human_readable_id",
+      header: "human_readable_id",
     },
     {
-      accessorKey: "full_content",
-      header: "Full Content",
+      accessorKey: "community",
+      header: "community",
     },
     {
       accessorKey: "level",
-      header: "Level",
-    },
-    {
-      accessorKey: "rank",
-      header: "Rank",
+      header: "level",
     },
     {
       accessorKey: "title",
-      header: "Title",
-    },
-    {
-      accessorKey: "rank_explanation",
-      header: "Rank Explanation",
+      header: "title",
     },
     {
       accessorKey: "summary",
-      header: "Summary",
+      header: "summary",
+    },
+    {
+      accessorKey: "full_content",
+      header: "full_content",
+    },
+    {
+      accessorKey: "rank",
+      header: "rank",
+    },
+    {
+      accessorKey: "rank_explanation",
+      header: "rank_explanation",
     },
     {
       accessorKey: "findings",
-      header: "Findings",
+      header: "findings",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -76,7 +87,11 @@ export const communityReportColumns: MRT_ColumnDef<CommunityReport>[] = [
       header: "Full Content JSON",
     },
     {
-      accessorKey: "id",
-      header: "ID",
+      accessorKey: "period",
+      header: "period",
+    },
+    {
+      accessorKey: "size",
+      header: "size",
     },
   ];

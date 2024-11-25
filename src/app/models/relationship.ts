@@ -1,68 +1,56 @@
 import { MRT_ColumnDef } from "material-react-table";
 
 export interface Relationship {
-    source: string;
-    target: string;
-    weight: number;
-    description: string;
-    text_unit_ids: string[];
     id: string;
     human_readable_id: number;
-    source_degree: number;
-    target_degree: number;
-    rank: number;
+    source: string;
+    target: string;
+    description: string;
+    weight: number;
+    combined_degree: number;
+    text_unit_ids: string[];    
     type: string; // Custom field to match neo4j
 }
 
 export const relationshipColumns: MRT_ColumnDef<Relationship>[] = [
     {
+        accessorKey: "id",
+        header: "id",
+    },
+    {
+        accessorKey: "human_readable_id",
+        header: "human_readable_id",
+    },
+    {
         accessorKey: "source",
-        header: "Source",
+        header: "source",
     },
     {
         accessorKey: "target",
-        header: "Target",
-    },
-    {
-        accessorKey: "type",
-        header: "Type",
-    },
-    {
-        accessorKey: "weight",
-        header: "Weight",
+        header: "target",
     },
     {
         accessorKey: "description",
-        header: "Description",
-    },
+        header: "description",
+    },    
+    {
+        accessorKey: "weight",
+        header: "weight",
+    },    
     {
         accessorKey: "text_unit_ids",
-        header: "Text Unit IDs",
+        header: "text_unit_ids",
         Cell: ({ renderedCellValue }) =>
             Array.isArray(renderedCellValue)
               ? JSON.stringify(renderedCellValue, null, 2)
               : renderedCellValue,
     },
     {
-        accessorKey: "id",
-        header: "ID",
+        accessorKey: "combined_degree",
+        header: "combined_degree",
     },
     {
-        accessorKey: "human_readable_id",
-        header: "Human Readable ID",
-    },
-    {
-        accessorKey: "source_degree",
-        header: "Source Degree",
-    },
-    {
-        accessorKey: "target_degree",
-        header: "Target Degree",
-    },
-    {
-        accessorKey: "rank",
-        header: "Rank",
-    },
-    
-    
+        accessorKey: "type",
+        header: "Type",
+    },            
 ];

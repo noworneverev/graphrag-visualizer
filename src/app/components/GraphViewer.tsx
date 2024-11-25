@@ -21,7 +21,6 @@ import {
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import SearchIcon from "@mui/icons-material/Search";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Fuse from "fuse.js";
 import {
   CSS2DRenderer,
@@ -525,10 +524,10 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     ? includeTextUnits && includeCommunities && includeCovariates
     : includeTextUnits && includeCommunities;
 
-  const clearSearchResults = () => {
-    setGraphData(initialGraphData.current);
-    setApiSearchResults(null);
-  };
+  // const clearSearchResults = () => {
+  //   setGraphData(initialGraphData.current);
+  //   setApiSearchResults(null);
+  // };
 
   return (
     <Box
@@ -881,7 +880,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       >
         <Typography variant="body2">Nodes: {nodeCount}</Typography>
         <Typography variant="body2">Relationships: {linkCount}</Typography>
-        <Button
+        {/* <Button
           variant="contained"
           onClick={toggleApiDrawer(true)}
           startIcon={<SearchIcon />}
@@ -896,7 +895,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           disabled={apiSearchResults === null}
         >
           Clear Query Results
-        </Button>
+        </Button> */}
       </Box>
     </Box>
   );
