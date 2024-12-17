@@ -9,6 +9,7 @@ export interface CommunityReport {
     id: string;
     human_readable_id: number;
     community: number;
+    parent?: number;
     level: number;
     title: string;
     summary: string;
@@ -51,6 +52,10 @@ export const communityReportColumns: MRT_ColumnDef<CommunityReport>[] = [
       header: "community",
     },
     {
+      accessorKey: "parent",
+      header: "parent",
+    },
+    {
       accessorKey: "level",
       header: "level",
     },
@@ -84,7 +89,7 @@ export const communityReportColumns: MRT_ColumnDef<CommunityReport>[] = [
     },
     {
       accessorKey: "full_content_json",
-      header: "Full Content JSON",
+      header: "full_content_json",
     },
     {
       accessorKey: "period",

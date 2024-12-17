@@ -4,6 +4,7 @@ export interface Community {
     id: number;
     human_readable_id: number;
     community: number;
+    parent?: number;
     level: number;
     title: string;    
     entity_ids: string[];
@@ -25,6 +26,10 @@ export const communityColumns: MRT_ColumnDef<Community>[] = [
     {
       accessorKey: "community",
       header: "community",
+    },
+    {
+      accessorKey: "parent",
+      header: "parent",
     },
     {
       accessorKey: "level",

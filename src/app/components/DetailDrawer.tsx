@@ -3,6 +3,7 @@ import {
   Box,
   Card,
   CardContent,
+  Chip,
   Drawer,
   IconButton,
   Typography,
@@ -105,6 +106,7 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({
         validAccessorKeys.add(tc.accessorKey);
       }
     });
+
     validAccessorKeys.add("uuid");
     return customNodeColumns.filter(
       (column) =>
@@ -176,15 +178,19 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({
                 Node Information
               </Typography>
               <Typography>ID: {selectedNode.uuid}</Typography>
-              <Typography>Name: {selectedNode.name}</Typography>
+              <Typography>Title: {selectedNode.name}</Typography>
               {selectedNode.covariate_type && (
                 <Typography>
                   Covariate Type: {selectedNode.covariate_type}
                 </Typography>
               )}
-              <Typography>Type: {selectedNode.type}</Typography>
+              <Typography>
+                Type: <Chip label={selectedNode.type} size="small" />{" "}
+              </Typography>
               {selectedNode.title && (
-                <Typography>Title: {selectedNode.title}</Typography>
+                <Typography>
+                  Community Report Title: {selectedNode.title}
+                </Typography>
               )}
               {selectedNode.summary && (
                 <Typography>Summary: {selectedNode.summary}</Typography>
@@ -264,11 +270,7 @@ const DetailDrawer: React.FC<DetailDrawerProps> = ({
           <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
             Linked Nodes
           </Typography>
-          <DataTable
-            // columns={customNodeColumns}
-            columns={filteredColumns}
-            data={linkedNodes}
-          />
+          <DataTable columns={filteredColumns} data={linkedNodes} />
         </Box>
         {selectedNode && (
           <Box>

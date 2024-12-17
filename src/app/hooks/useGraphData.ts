@@ -21,13 +21,14 @@ const useGraphData = (
   includeCommunities: boolean,
   includeCovariates: boolean
 ) => {
-  const [graphData, setGraphData] = useState<CustomGraphData>({ nodes: [], links: [] });
-
+  
+  const [graphData, setGraphData] = useState<CustomGraphData>({ nodes: [], links: [] });  
   useEffect(() => {
     const nodes: CustomNode[] = entities.map((entity) => ({
       uuid: entity.id,
-      id: entity.title,
-      name: entity.title,
+      id: entity.title, // use title as id because relationships use title as source/target
+      name: entity.title, // legacy field for old GraphRAG 0.2.x - 0.3.x
+      title: entity.title, // new field for GraphRAG 0.5.0+ (change name to title)
       type: entity.type,
       description: entity.description,
       human_readable_id: entity.human_readable_id,      
@@ -122,10 +123,10 @@ const useGraphData = (
     }
 
     if (includeCommunities) {
-      const communityNodes = communities.map((community) => {
+      const communityNodes = communities.map((community) => {                
         const report = communityReports.find(
-          (r) => r.community.toString() === community.id.toString()
-        );
+          (r) => r.community.toString() === community.community.toString()
+        );        
         return {
           uuid: community.id.toString(),
           id: community.id.toString(),
@@ -143,8 +144,7 @@ const useGraphData = (
           neighbors: [],
           links: [],
         };
-      });
-
+      });      
       communityNodes.forEach(node => nodesMap[node.id] = node);
       nodes.push(...communityNodes);
 
@@ -187,8 +187,8 @@ const useGraphData = (
 
       links.push(...communityEntityLinks);
 
-      //Add finding nodes and links
-      communityNodes.forEach((communityNode) => {
+      //Add finding nodes and links      
+      communityNodes.forEach((communityNode) => {        
         if (communityNode.findings) {
           communityNode.findings.forEach((finding, idx) => {
             const findingNode = {

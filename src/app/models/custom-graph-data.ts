@@ -41,6 +41,7 @@ export interface CustomNode extends NodeObject {
     source_text?: string;
     text_unit_id?: string;
     covariate_type?: string;
+    parent?: number;
   }
   
 export interface CustomLink extends LinkObject {
@@ -67,27 +68,31 @@ export interface CustomGraphData extends GraphData {
   export const customNodeColumns: MRT_ColumnDef<CustomNode>[] = [
     {
       accessorKey: "uuid",
-      header: "ID",
-    },
-    {
-      accessorKey: "name",
-      header: "Name",
-    },
-    {
-      accessorKey: "type",
-      header: "Type",
-    },
-    {
-      accessorKey: "description",
-      header: "Description",
+      header: "id",
     },
     {
       accessorKey: "human_readable_id",
-      header: "Human Readable ID",
+      header: "human_readable_id",
+    },
+    {
+      accessorKey: "name",
+      header: "name",
+    },
+    {
+      accessorKey: "title",
+      header: "title",
+    },    
+    {
+      accessorKey: "type",
+      header: "type",
+    },
+    {
+      accessorKey: "description",
+      header: "description",
     },
     {
       accessorKey: "graph_embedding",
-      header: "Graph Embedding",
+      header: "graph_embedding",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -95,7 +100,7 @@ export interface CustomGraphData extends GraphData {
     },
     {
       accessorKey: "text_unit_ids",
-      header: "Text Unit IDs",
+      header: "text_unit_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -103,7 +108,7 @@ export interface CustomGraphData extends GraphData {
     },
     {
       accessorKey: "description_embedding",
-      header: "Description Embedding",
+      header: "description_embedding",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -111,35 +116,35 @@ export interface CustomGraphData extends GraphData {
     },
     {
       accessorKey: "level",
-      header: "Level",
+      header: "level",
     },
     {
       accessorKey: "n_tokens",
-      header: "Number of Tokens",
+      header: "n_tokens",
     },
     {
       accessorKey: "rank",
-      header: "Rank",
+      header: "rank",
     },
     {
       accessorKey: "rank_explanation",
-      header: "Rank Explanation",
+      header: "rank_explanation",
     },
     {
       accessorKey: "summary",
-      header: "Summary",
+      header: "summary",
     },
     {
       accessorKey: "full_content",
-      header: "Full Content",
+      header: "full_content",
     },
     {
       accessorKey: "explanation",
-      header: "Explanation",
+      header: "explanation",
     },
     {
       accessorKey: "findings",
-      header: "Findings",
+      header: "findings",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -147,11 +152,11 @@ export interface CustomGraphData extends GraphData {
     },
     {
       accessorKey: "text",
-      header: "Text",
+      header: "text",
     },
     {
       accessorKey: "document_ids",
-      header: "Document IDs",
+      header: "document_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -159,7 +164,7 @@ export interface CustomGraphData extends GraphData {
     },
     {
       accessorKey: "entity_ids",
-      header: "Entity IDs",
+      header: "entity_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -167,7 +172,7 @@ export interface CustomGraphData extends GraphData {
     },
     {
       accessorKey: "relationship_ids",
-      header: "Relationship IDs",
+      header: "relationship_ids",
       Cell: ({ renderedCellValue }) =>
         Array.isArray(renderedCellValue)
           ? JSON.stringify(renderedCellValue, null, 2)
@@ -179,27 +184,27 @@ export interface CustomGraphData extends GraphData {
   export const customLinkColumns: MRT_ColumnDef<CustomLink>[] = [
     {
         accessorKey: "source",
-        header: "Source",
+        header: "source",
     },
     {
         accessorKey: "target",
-        header: "Target",
+        header: "target",
     },
     {
         accessorKey: "type",
-        header: "Type",
+        header: "type",
     },
     {
         accessorKey: "weight",
-        header: "Weight",
+        header: "weight",
     },
     {
         accessorKey: "description",
-        header: "Description",
+        header: "description",
     },
     {
         accessorKey: "text_unit_ids",
-        header: "Text Unit IDs",
+        header: "text_unit_ids",
         Cell: ({ renderedCellValue }) =>
           Array.isArray(renderedCellValue)
             ? JSON.stringify(renderedCellValue, null, 2)
@@ -207,22 +212,26 @@ export interface CustomGraphData extends GraphData {
     },
     {
         accessorKey: "id",
-        header: "ID",
+        header: "id",
     },
     {
         accessorKey: "human_readable_id",
-        header: "Human Readable ID",
+        header: "human_readable_id",
     },
     {
         accessorKey: "source_degree",
-        header: "Source Degree",
+        header: "source_degree",
     },
     {
         accessorKey: "target_degree",
-        header: "Target Degree",
+        header: "target_degree",
+    },
+    {
+      accessorKey: "combined_degree",
+      header: "combined_degree",
     },
     {
         accessorKey: "rank",
-        header: "Rank",
+        header: "rank",
     },
 ];
