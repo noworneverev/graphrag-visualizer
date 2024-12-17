@@ -51,6 +51,6 @@ export const relationshipColumns: MRT_ColumnDef<Relationship>[] = [
     },
     {
         accessorKey: "type",
-        header: "Type",
+        header: "type",
     },            
 ];

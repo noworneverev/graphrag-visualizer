@@ -34,112 +34,114 @@ export const readParquetFile = async (
     return new Promise((resolve, reject) => {
       const options: ParquetReadOptions = {
         file: asyncBuffer,
-        onComplete: (rows: any[][]) => {
+        rowFormat: 'object',
+        onComplete: (rows: Record<string, any>[]) => {          
           if (schema === "entity") {
+            
             resolve(
-              rows.map((row) => ({
-                id: row[0],
-                human_readable_id: parseValue(row[1], "number"),
-                title: row[2],
-                type: row[3],
-                description: row[4],                                
-                text_unit_ids: row[5],                
+              rows.map((row) => ({         
+                id: row["id"],                
+                human_readable_id: parseValue(row["human_readable_id"], "number"),
+                title: row["title"],
+                type: row["type"],
+                description: row["description"],
+                text_unit_ids: row["text_unit_ids"],
+
               }))
             );
           } else if (schema === "relationship") {
             resolve(
               rows.map((row) => ({
-                id: row[0],
-                human_readable_id: parseValue(row[1], "number"),
-                source: row[2],
-                target: row[3],
-                description: row[4],
-                weight: row[5],
-                combined_degree: parseValue(row[6], "number"),
-                text_unit_ids: row[7],
-                type: "RELATED", // Custom field to match neo4j                
+                id: row["id"],
+                human_readable_id: parseValue(row["human_readable_id"], "number"),                
+                source: row["source"],
+                target: row["target"],
+                description: row["description"],
+                weight: row["weight"],
+                combined_degree: parseValue(row["combined_degree"], "number"),                
+                text_unit_ids: row["text_unit_ids"],
+                type: "RELATED", // Custom field to match neo4j            
               }))
             );
           } else if (schema === "document") {
             resolve(
               rows.map((row) => ({
-                id: row[0],
-                human_readable_id: parseValue(row[1], "number"),
-                title: row[2],
-                text: row[3],
-                text_unit_ids: row[4],                
+                id: row["id"],
+                human_readable_id: parseValue(row["human_readable_id"], "number"),                
+                title: row["title"],
+                text: row["text"],
+                text_unit_ids: row["text_unit_ids"],           
               }))
             );
           } else if (schema === "text_unit") {
             resolve(
               rows.map((row) => ({
-                id: row[0],
-                human_readable_id: parseValue(row[1], "number"),
-                text: row[2],
-                n_tokens: parseValue(row[3], "number"),
-                document_ids: row[4],
-                entity_ids: row[5],
-                relationship_ids: row[6],
+                id: row["id"],
+                human_readable_id: parseValue(row["human_readable_id"], "number"),                
+                text: row["text"],
+                n_tokens: parseValue(row["n_tokens"], "number"),                
+                document_ids: row["document_ids"],
+                entity_ids: row["entity_ids"],
+                relationship_ids: row["relationship_ids"],
               }))
             );
           } else if (schema === "community") {
             resolve(
               rows.map((row) => ({
-                id: row[0],
-                human_readable_id: parseValue(row[1], "number"),
-                community: parseValue(row[2], "number"),
-                level: parseValue(row[3], "number"),
-                title: row[4],
-                entity_ids: row[5],
-                relationship_ids: row[6],
-                text_unit_ids: row[7],
-                period: row[8],
-                size: parseValue(row[9], "number"),
+                id: row["id"],
+                human_readable_id: parseValue(row["human_readable_id"], "number"),     
+                community: parseValue(row["community"], "number"),
+                parent: parseValue(row["parent"], "number"),                
+                level: parseValue(row["level"], "number"),                
+                title: row["title"],
+                entity_ids: row["entity_ids"],
+                relationship_ids: row["relationship_ids"],
+                text_unit_ids: row["text_unit_ids"],
+                period: row["period"],                
+                size: parseValue(row["size"], "number"),
               }))
             );
           } else if (schema === "community_report") {
             resolve(
               rows.map((row) => ({
-                id: row[0],
-                human_readable_id: parseValue(row[1], "number"),
-                community: parseValue(row[2], "number"),
-                level: parseValue(row[3], "number"),
-                title: row[4],
-                summary: row[5],
-                full_content: row[6],
-                rank: parseValue(row[7], "number"),                
-                rank_explanation: row[8],                
-                findings: row[9].map((finding: any) => ({
-                  explanation: finding.explanation,
-                  summary: finding.summary,
-                })),
-                full_content_json: row[10],  
-                period: row[11],
-                size: parseValue(row[12], "number"),              
+                id: row["id"],
+                human_readable_id: parseValue(row["human_readable_id"], "number"),
+                community: parseValue(row["community"], "number"),       
+                parent: parseValue(row["parent"], "number"),
+                level: parseValue(row["level"], "number"),                
+                title: row["title"],
+                summary: row["summary"],
+                full_content: row["full_content"],
+                rank: row["rank"],
+                rank_explanation: row["rank_explanation"],
+                findings: row["findings"],
+                full_content_json: row["full_content_json"],
+                period: row["period"],                
+                size: parseValue(row["size"], "number"),            
               }))
             );
           } else if (schema === "covariate") {
             resolve(
               rows.map((row) => ({
-                id: row[0],
-                human_readable_id: parseValue(row[1], "number"),
-                covariate_type: row[2],
-                type: row[3],
-                description: row[4],
-                subject_id: row[5],                
-                object_id: row[6],                
-                status: row[7],
-                start_date: row[8],
-                end_date: row[9],
-                source_text: row[10],
-                text_unit_id: row[11],                
+                id: row["id"],
+                human_readable_id: parseValue(row["human_readable_id"], "number"),                
+                covariate_type: row["covariate_type"],
+                type: row["type"],
+                description: row["description"],
+                subject_id: row["subject_id"],
+                object_id: row["object_id"],
+                status: row["status"],
+                start_date: row["start_date"],
+                end_date: row["end_date"],
+                source_text: row["source_text"],
+                text_unit_id: row["text_unit_id"],              
               }))
             );
           } else {
             resolve(
-              rows.map((row) =>
-                Object.fromEntries(row.map((value, index) => [index, value]))
-              )
+              rows.map((row: Record<string, any>) => ({
+                ...row
+              }))
             );
           }
         },
