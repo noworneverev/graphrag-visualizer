@@ -114,7 +114,7 @@ const DataTableContainer: React.FC<DataTableContainerProps> = ({
         {selectedTable === "entities" && (
           <>
             <Typography variant="h4" gutterBottom>
-              Entities (create_final_entities.parquet)
+              Entities (entities.parquet)
             </Typography>
             <DataTable columns={entityColumns} data={entities} />
           </>
@@ -122,7 +122,7 @@ const DataTableContainer: React.FC<DataTableContainerProps> = ({
         {selectedTable === "relationships" && (
           <>
             <Typography variant="h4" gutterBottom>
-              Relationships (create_final_relationships.parquet)
+              Relationships (relationships.parquet)
             </Typography>
             <DataTable columns={relationshipColumns} data={relationships} />
           </>
@@ -130,7 +130,7 @@ const DataTableContainer: React.FC<DataTableContainerProps> = ({
         {selectedTable === "documents" && (
           <>
             <Typography variant="h4" gutterBottom>
-              Documents (create_final_documents.parquet)
+              Documents (documents.parquet)
             </Typography>
             <DataTable columns={documentColumns} data={documents} />
           </>
@@ -138,7 +138,7 @@ const DataTableContainer: React.FC<DataTableContainerProps> = ({
         {selectedTable === "textunits" && (
           <>
             <Typography variant="h4" gutterBottom>
-              TextUnits (create_final_text_units.parquet)
+              TextUnits (text_units.parquet)
             </Typography>
             <DataTable columns={textUnitColumns} data={textunits} />
           </>
@@ -146,7 +146,7 @@ const DataTableContainer: React.FC<DataTableContainerProps> = ({
         {selectedTable === "communities" && (
           <>
             <Typography variant="h4" gutterBottom>
-              Communities (create_final_communities.parquet)
+              Communities (communities.parquet)
             </Typography>
             <DataTable columns={communityColumns} data={communities} />
           </>
@@ -154,7 +154,7 @@ const DataTableContainer: React.FC<DataTableContainerProps> = ({
         {selectedTable === "communityReports" && (
           <>
             <Typography variant="h4" gutterBottom>
-              Community Reports (create_final_community_reports.parquet)
+              Community Reports (community_reports.parquet)
             </Typography>
             <DataTable
               columns={communityReportColumns}
@@ -165,7 +165,7 @@ const DataTableContainer: React.FC<DataTableContainerProps> = ({
         {selectedTable === "covariates" && (
           <>
             <Typography variant="h4" gutterBottom>
-              Covariates (create_final_covariates.parquet)
+              Covariates (covariates.parquet)
             </Typography>
             <DataTable columns={covariateColumns} data={covariates} />
           </>

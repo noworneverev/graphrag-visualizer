@@ -85,12 +85,22 @@ The logic for creating relationships for text units, documents, communities, and
 
 To load `.parquet` files automatically when the application starts, place your Parquet files in the `public/artifacts` directory. These files will be loaded into the application for visualization and data table display. The files can be organized as follows:
 
-- `public/artifacts/create_final_entities.parquet`
-- `public/artifacts/create_final_relationships.parquet`
-- `public/artifacts/create_final_documents.parquet`
-- `public/artifacts/create_final_text_units.parquet`
-- `public/artifacts/create_final_communities.parquet`
-- `public/artifacts/create_final_community_reports.parquet`
-- `public/artifacts/create_final_covariates.parquet`
+- GraphRAG v2.x.x
+  - `public/artifacts/entities.parquet`
+  - `public/artifacts/relationships.parquet`
+  - `public/artifacts/documents.parquet`
+  - `public/artifacts/text_units.parquet`
+  - `public/artifacts/communities.parquet`
+  - `public/artifacts/community_reports.parquet`
+  - `public/artifacts/covariates.parquet`
+
+- GraphRAG v1.x.x
+  - `public/artifacts/create_final_entities.parquet`
+  - `public/artifacts/create_final_relationships.parquet`
+  - `public/artifacts/create_final_documents.parquet`
+  - `public/artifacts/create_final_text_units.parquet`
+  - `public/artifacts/create_final_communities.parquet`
+  - `public/artifacts/create_final_community_reports.parquet`
+  - `public/artifacts/create_final_covariates.parquet`
 
 If the files are placed in the `public/artifacts` folder, the app will automatically load and display them on startup.
