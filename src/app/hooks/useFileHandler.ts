@@ -9,26 +9,31 @@ import { CommunityReport } from "../models/community-report";
 import { Covariate } from "../models/covariate";
 import { readParquetFile } from "../utils/parquet-utils";
 
-// Paths to default files in the public folder
-const defaultFiles = [
-  process.env.PUBLIC_URL + "/artifacts/create_final_entities.parquet",
-  process.env.PUBLIC_URL + "/artifacts/create_final_relationships.parquet",
-  process.env.PUBLIC_URL + "/artifacts/create_final_documents.parquet",
-  process.env.PUBLIC_URL + "/artifacts/create_final_text_units.parquet",
-  process.env.PUBLIC_URL + "/artifacts/create_final_communities.parquet",
-  process.env.PUBLIC_URL + "/artifacts/create_final_community_reports.parquet",
-  process.env.PUBLIC_URL + "/artifacts/create_final_covariates.parquet",
+const baseFileNames = [
+  "entities.parquet",
+  "relationships.parquet",
+  "documents.parquet",
+  "text_units.parquet",
+  "communities.parquet",
+  "community_reports.parquet",
+  "covariates.parquet",
 ];
 
-const fileSchemas: { [key: string]: string } = {
-  "create_final_entities.parquet": "entity",
-  "create_final_relationships.parquet": "relationship",
-  "create_final_text_units.parquet": "text_unit",
-  "create_final_communities.parquet": "community",
-  "create_final_community_reports.parquet": "community_report",
-  "create_final_documents.parquet": "document",
-  "create_final_covariates.parquet": "covariate",
+const baseMapping: { [key: string]: string } = {
+  "entities.parquet": "entity",
+  "relationships.parquet": "relationship",
+  "documents.parquet": "document",
+  "text_units.parquet": "text_unit",
+  "communities.parquet": "community",
+  "community_reports.parquet": "community_report",
+  "covariates.parquet": "covariate",
 };
+
+const fileSchemas: { [key: string]: string } = {};
+Object.entries(baseMapping).forEach(([key, value]) => {  
+  fileSchemas[key] = value;  
+  fileSchemas[`create_final_${key}`] = value;
+});
 
 const useFileHandler = () => {
   const navigate = useNavigate();
@@ -57,8 +62,8 @@ const useFileHandler = () => {
 
     for (const file of files) {
       const fileName =
-        typeof file === "string" ? file.split("/").pop()! : file.name;
-      const schema = fileSchemas[fileName];
+        typeof file === "string" ? file.split("/").pop()! : file.name;      
+      const schema = fileSchemas[fileName] || fileSchemas[`create_final_${fileName}`];
 
       let data;
       if (typeof file === "string") {
@@ -144,12 +149,17 @@ const useFileHandler = () => {
   const loadDefaultFiles = async () => {
     const filesToLoad = [];
 
-    for (const file of defaultFiles) {
-      const fileExists = await checkFileExists(file);
-      if (fileExists) {
-        filesToLoad.push(file); // Add to load queue if the file exists
+    for (const baseName of baseFileNames) {
+      const prefixedPath = process.env.PUBLIC_URL + `/artifacts/create_final_${baseName}`;
+      const unprefixedPath = process.env.PUBLIC_URL + `/artifacts/${baseName}`;
+  
+      if (await checkFileExists(prefixedPath)) {
+        filesToLoad.push(prefixedPath);
+      } else if (await checkFileExists(unprefixedPath)) {
+        filesToLoad.push(unprefixedPath);
       }
     }
+    
     if (filesToLoad.length > 0) {
       await loadFiles(filesToLoad);
       navigate("/graph", { replace: true });
