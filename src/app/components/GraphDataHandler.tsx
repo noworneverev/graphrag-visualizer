@@ -30,6 +30,7 @@ const GraphDataHandler: React.FC = () => {
   const [includeTextUnits, setIncludeTextUnits] = useState(false);
   const [includeCommunities, setIncludeCommunities] = useState(false);
   const [includeCovariates, setIncludeCovariates] = useState(false);
+  const [maxEntities, setMaxEntities] = useState(500);
 
   const {
     entities,
@@ -54,7 +55,8 @@ const GraphDataHandler: React.FC = () => {
     includeDocuments,
     includeTextUnits,
     includeCommunities,
-    includeCovariates
+    includeCovariates,
+    maxEntities
   );
 
   const hasDocuments = documents.length > 0;
@@ -190,6 +192,9 @@ const GraphDataHandler: React.FC = () => {
             hasTextUnits={hasTextUnits}
             hasCommunities={hasCommunities}
             hasCovariates={hasCovariates}
+            maxEntities={maxEntities}
+            onMaxEntitiesChange={setMaxEntities}
+            totalEntities={entities.length}
           />
         </Box>
       )}

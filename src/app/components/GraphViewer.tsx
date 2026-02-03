@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   FormGroup,
   IconButton,
+  Slider,
   Switch,
   Tooltip,
   Typography,
@@ -60,6 +61,9 @@ interface GraphViewerProps {
   hasTextUnits: boolean;
   hasCommunities: boolean;
   hasCovariates: boolean;
+  maxEntities: number;
+  onMaxEntitiesChange: React.Dispatch<React.SetStateAction<number>>;
+  totalEntities: number;
 }
 
 const NODE_R = 8;
@@ -82,6 +86,9 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   hasTextUnits,
   hasCommunities,
   hasCovariates,
+  maxEntities,
+  onMaxEntitiesChange,
+  totalEntities,
 }) => {
   const theme = useTheme();
   const [highlightNodes, setHighlightNodes] = useState<Set<CustomNode>>(
@@ -716,6 +723,29 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             label="Include Covariates"
           />
         </FormGroup>
+
+        {totalEntities > 0 && (
+          <Box sx={{ width: 200, mt: 2 }}>
+            <Typography variant="body2" gutterBottom>
+              Max Entities: {maxEntities === 0 ? "All" : maxEntities}
+              {totalEntities > 0 && ` / ${totalEntities}`}
+            </Typography>
+            <Slider
+              value={maxEntities}
+              onChange={(_, value) => onMaxEntitiesChange(value as number)}
+              min={0}
+              max={Math.max(totalEntities, 1000)}
+              step={50}
+              marks={[
+                { value: 0, label: "All" },
+                { value: 500, label: "500" },
+              ]}
+              valueLabelDisplay="auto"
+              valueLabelFormat={(value) => (value === 0 ? "All" : value)}
+              disabled={apiSearchResults !== null}
+            />
+          </Box>
+        )}
       </Box>
 
       <APISearchDrawer

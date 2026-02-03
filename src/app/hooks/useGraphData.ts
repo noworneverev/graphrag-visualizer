@@ -19,12 +19,32 @@ const useGraphData = (
   includeDocuments: boolean,
   includeTextUnits: boolean,
   includeCommunities: boolean,
-  includeCovariates: boolean
+  includeCovariates: boolean,
+  maxEntities: number = 0 // 0 means no limit
 ) => {
   
   const [graphData, setGraphData] = useState<CustomGraphData>({ nodes: [], links: [] });  
   useEffect(() => {
-    const nodes: CustomNode[] = entities.map((entity) => ({
+    // Calculate relationship count for each entity to determine top N
+    const entityRelationshipCount: { [key: string]: number } = {};
+    relationships.forEach((rel) => {
+      entityRelationshipCount[rel.source] = (entityRelationshipCount[rel.source] || 0) + 1;
+      entityRelationshipCount[rel.target] = (entityRelationshipCount[rel.target] || 0) + 1;
+    });
+
+    // Sort entities by relationship count and limit to maxEntities if specified
+    let filteredEntities = entities;
+    if (maxEntities > 0 && entities.length > maxEntities) {
+      filteredEntities = [...entities]
+        .sort((a, b) => {
+          const countA = entityRelationshipCount[a.title] || 0;
+          const countB = entityRelationshipCount[b.title] || 0;
+          return countB - countA; // Sort descending
+        })
+        .slice(0, maxEntities);
+    }
+
+    const nodes: CustomNode[] = filteredEntities.map((entity) => ({
       uuid: entity.id,
       id: entity.title, // use title as id because relationships use title as source/target
       name: entity.title, // legacy field for old GraphRAG 0.2.x - 0.3.x
@@ -111,13 +131,17 @@ const useGraphData = (
       const textUnitEntityLinks = textunits
         .filter((textunit) => (textunit.entity_ids ?? []).length > 0)
         .flatMap((textunit) =>
-          textunit.entity_ids.map((entityId) => ({
-            source: textunit.id,
-            target: nodes.find((e) => e.uuid === entityId)?.name || "",
-            type: "HAS_ENTITY",
-            id: `${textunit.id}-${entityId}`,
-          }))
-        );
+          textunit.entity_ids.map((entityId) => {
+            const targetName = nodes.find((e) => e.uuid === entityId)?.name;
+            return targetName ? {
+              source: textunit.id,
+              target: targetName,
+              type: "HAS_ENTITY",
+              id: `${textunit.id}-${entityId}`,
+            } : null;
+          })
+        )
+        .filter((link): link is NonNullable<typeof link> => link !== null);
 
       links.push(...textUnitEntityLinks);
     }
@@ -160,7 +184,8 @@ const useGraphData = (
 
             const newLinks = [];
 
-            if (!uniqueLinks.has(sourceLinkId)) {
+            // Only add link if source node exists
+            if (!uniqueLinks.has(sourceLinkId) && nodesMap[relationship.source]) {
               uniqueLinks.add(sourceLinkId);
               newLinks.push({
                 source: relationship.source,
@@ -170,7 +195,8 @@ const useGraphData = (
               });
             }
 
-            if (!uniqueLinks.has(targetLinkId)) {
+            // Only add link if target node exists
+            if (!uniqueLinks.has(targetLinkId) && nodesMap[relationship.target]) {
               uniqueLinks.add(targetLinkId);
               newLinks.push({
                 source: relationship.target,
@@ -242,12 +268,14 @@ const useGraphData = (
       covariateNodes.forEach(node => nodesMap[node.id] = node);
       nodes.push(...covariateNodes);
 
-      const covariateTextUnitLinks = covariates.map((covariate) => ({
-        source: covariate.text_unit_id,
-        target: covariate.id,
-        type: "HAS_COVARIATE",
-        id: `${covariate.text_unit_id}-${covariate.id}`,
-      }));
+      const covariateTextUnitLinks = covariates
+        .filter((covariate) => nodesMap[covariate.text_unit_id] && nodesMap[covariate.id])
+        .map((covariate) => ({
+          source: covariate.text_unit_id,
+          target: covariate.id,
+          type: "HAS_COVARIATE",
+          id: `${covariate.text_unit_id}-${covariate.id}`,
+        }));
 
       links.push(...covariateTextUnitLinks);
     }
@@ -283,6 +311,7 @@ const useGraphData = (
     includeTextUnits,
     includeCommunities,
     includeCovariates,
+    maxEntities,
   ]);
 
   return graphData;
