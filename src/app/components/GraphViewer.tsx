@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
 import ForceGraph2D from "react-force-graph-2d";
 import ForceGraph3D from "react-force-graph-3d";
 import {
@@ -36,6 +42,8 @@ import { SearchResult } from "../models/search-result";
 import agent from "../api/agent";
 import APISearchDrawer from "./APISearchDrawer";
 import SpriteText from "three-spritetext";
+import { useGraphForces } from "../hooks/useGraphForces";
+import { sanitizeGraphData } from "../utils/sanitizeGraphData";
 
 type Coords = {
   x: number;
@@ -91,11 +99,23 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   totalEntities,
 }) => {
   const theme = useTheme();
+  const sliderMax = Math.max(totalEntities, 1000);
+  const sliderMin = 50;
+  const toSliderValue = (value: number) =>
+    value === 0 ? sliderMax : Math.min(value, sliderMax);
+  const fromSliderValue = (value: number) => (value >= sliderMax ? 0 : value);
+  const committedSliderValue = toSliderValue(maxEntities);
+  const [isSliderDragging, setIsSliderDragging] = useState(false);
+  const [dragSliderValue, setDragSliderValue] = useState<number | null>(null);
+  const sliderValue =
+    isSliderDragging && dragSliderValue !== null
+      ? dragSliderValue
+      : committedSliderValue;
   const [highlightNodes, setHighlightNodes] = useState<Set<CustomNode>>(
-    new Set()
+    new Set(),
   );
   const [highlightLinks, setHighlightLinks] = useState<Set<CustomLink>>(
-    new Set()
+    new Set(),
   );
   const [hoverNode, setHoverNode] = useState<CustomNode | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -109,7 +129,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     useState<CustomLink | null>(null);
   const [linkedNodes, setLinkedNodes] = useState<CustomNode[]>([]);
   const [linkedRelationships, setLinkedRelationships] = useState<CustomLink[]>(
-    []
+    [],
   );
   const [showLabels, setShowLabels] = useState(false);
   const [showLinkLabels, setShowLinkLabels] = useState(false);
@@ -121,22 +141,63 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
 
   const [apiDrawerOpen, setApiDrawerOpen] = useState(false);
   const [apiSearchResults, setApiSearchResults] = useState<SearchResult | null>(
-    null
+    null,
   );
   const [serverUp, setServerUp] = useState<boolean>(false);
 
-  const [graphData, setGraphData] = useState<CustomGraphData>(data);
+  const [searchGraphData, setSearchGraphData] =
+    useState<CustomGraphData | null>(null);
 
-  const initialGraphData = useRef<CustomGraphData>(data);
+  const sanitizedBaseData = useMemo(() => sanitizeGraphData(data), [data]);
+  const initialGraphData = useRef<CustomGraphData>(sanitizedBaseData);
+  const prevBaseDataRef = useRef(data);
+
+  if (prevBaseDataRef.current !== data) {
+    prevBaseDataRef.current = data;
+    initialGraphData.current = sanitizedBaseData;
+  }
+
+  const displayGraphData = useMemo(() => {
+    if (apiSearchResults && searchGraphData) {
+      return searchGraphData;
+    }
+    return sanitizeGraphData(data);
+  }, [apiSearchResults, searchGraphData, data]);
+
+  const graphRenderKey = useMemo(
+    () =>
+      `${maxEntities}-${displayGraphData.nodes.length}-${displayGraphData.links.length}`,
+    [maxEntities, displayGraphData.nodes.length, displayGraphData.links.length],
+  );
 
   useEffect(() => {
-    setGraphData(data);
-    initialGraphData.current = data;
-  }, [data]);
+    setHighlightNodes(new Set());
+    setHighlightLinks(new Set());
+    setHoverNode(null);
+  }, [graphRenderKey]);
+
+  const getNodeSize = useCallback((node: CustomNode) => {
+    const type = node.type;
+    switch (type) {
+      case "RAW_DOCUMENT":
+        return 9;
+      case "CHUNK":
+        return 6;
+      case "COMMUNITY":
+        return 13;
+      case "FINDING":
+        return 3;
+      default:
+        // Entity nodes (PERSON, ORGANIZATION, etc.) or covariate nodes
+        return node.covariate_type ? 1 : 20;
+    }
+  }, []);
 
   useEffect(() => {
     checkServerStatus();
   }, []);
+
+  useGraphForces(graphRef, getNodeSize, displayGraphData);
 
   const toggleApiDrawer = (open: boolean) => () => {
     setApiDrawerOpen(open);
@@ -144,7 +205,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
 
   const handleApiSearch = async (
     query: string,
-    searchType: "local" | "global"
+    searchType: "local" | "global",
   ) => {
     try {
       const data: SearchResult =
@@ -190,7 +251,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             // Handle links
             const existingLink = baseGraphData.links.find(
               (link) =>
-                link.human_readable_id?.toString() === item.id.toString()
+                link.human_readable_id?.toString() === item.id.toString(),
             );
 
             if (existingLink) {
@@ -200,21 +261,21 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             const existingNode = baseGraphData.nodes.find(
               (node) =>
                 node.human_readable_id?.toString() === item.id.toString() &&
-                !node.covariate_type
+                !node.covariate_type,
             );
             if (existingNode) {
               newNodes.push(existingNode);
             }
           } else if (key === "reports") {
             const existingNode = baseGraphData.nodes.find(
-              (node) => node.uuid === item.id.toString()
+              (node) => node.uuid === item.id.toString(),
             );
             if (existingNode) {
               newNodes.push(existingNode);
             }
           } else if (key === "sources") {
             const existingNode = baseGraphData.nodes.find(
-              (node) => node.text?.toString() === item.text
+              (node) => node.text?.toString() === item.text,
             );
             if (existingNode) {
               newNodes.push(existingNode);
@@ -223,7 +284,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             const existingNode = baseGraphData.nodes.find(
               (node) =>
                 node.human_readable_id?.toString() === item.id.toString() &&
-                node.covariate_type
+                node.covariate_type,
             );
             if (existingNode) {
               newNodes.push(existingNode);
@@ -234,13 +295,13 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     });
 
     // Update the graph data with the new nodes and links
-    const updatedGraphData: CustomGraphData = {
+    const updatedGraphData: CustomGraphData = sanitizeGraphData({
       nodes: [...newNodes],
       links: [...newLinks],
-    };
+    });
 
     // Set the updated data to trigger re-render
-    setGraphData(updatedGraphData);
+    setSearchGraphData(updatedGraphData);
   };
 
   const fuse = new Fuse([...data.nodes, ...data.links], {
@@ -289,8 +350,10 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
 
   const paintRing = useCallback(
     (node: CustomNode, ctx: CanvasRenderingContext2D) => {
+      const size = getNodeSize(node);
+      const radius = Math.sqrt(size) * NODE_R * 1.4;
       ctx.beginPath();
-      ctx.arc(node.x!, node.y!, NODE_R * 1.4, 0, 2 * Math.PI, false);
+      ctx.arc(node.x!, node.y!, radius, 0, 2 * Math.PI, false);
       if (highlightNodes.has(node)) {
         ctx.fillStyle = node === hoverNode ? "red" : "orange";
         ctx.globalAlpha = 1; // full opacity
@@ -301,14 +364,14 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       ctx.fill();
       ctx.globalAlpha = 1; // reset alpha for other drawings
     },
-    [hoverNode, highlightNodes]
+    [hoverNode, highlightNodes, getNodeSize],
   );
 
   const handleSearch = () => {
     const results = fuse.search(searchTerm).map((result) => result.item);
     const nodeResults = results.filter((item) => "neighbors" in item);
     const linkResults = results.filter(
-      (item) => "source" in item && "target" in item
+      (item) => "source" in item && "target" in item,
     );
     setSearchResults([...nodeResults, ...linkResults]);
     setRightDrawerOpen(true);
@@ -335,7 +398,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
         graphRef.current.cameraPosition(
           { x: node.x, y: node.y, z: 300 }, // new position
           { x: node.x, y: node.y, z: 0 }, // lookAt
-          3000 // ms transition duration
+          3000, // ms transition duration
         );
       }
     }
@@ -388,7 +451,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
         graphRef.current.cameraPosition(
           { x: midX, y: midY, z: 300 }, // new position
           { x: midX, y: midY, z: 0 }, // lookAt
-          3000 // ms transition duration
+          3000, // ms transition duration
         );
       }
     }
@@ -472,28 +535,28 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
         node.x + boxWidth / 2,
         node.y - boxHeight / 2,
         node.x + boxWidth / 2,
-        node.y - boxHeight / 2 + 5
+        node.y - boxHeight / 2 + 5,
       );
       ctx.lineTo(node.x + boxWidth / 2, node.y + boxHeight / 2 - 5);
       ctx.quadraticCurveTo(
         node.x + boxWidth / 2,
         node.y + boxHeight / 2,
         node.x + boxWidth / 2 - 5,
-        node.y + boxHeight / 2
+        node.y + boxHeight / 2,
       );
       ctx.lineTo(node.x - boxWidth / 2 + 5, node.y + boxHeight / 2);
       ctx.quadraticCurveTo(
         node.x - boxWidth / 2,
         node.y + boxHeight / 2,
         node.x - boxWidth / 2,
-        node.y + boxHeight / 2 - 5
+        node.y + boxHeight / 2 - 5,
       );
       ctx.lineTo(node.x - boxWidth / 2, node.y - boxHeight / 2 + 5);
       ctx.quadraticCurveTo(
         node.x - boxWidth / 2,
         node.y - boxHeight / 2,
         node.x - boxWidth / 2 + 5,
-        node.y - boxHeight / 2
+        node.y - boxHeight / 2,
       );
       ctx.closePath();
       ctx.fill();
@@ -533,8 +596,8 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     : includeTextUnits && includeCommunities;
 
   const clearSearchResults = () => {
-    setGraphData(initialGraphData.current);
     setApiSearchResults(null);
+    setSearchGraphData(null);
   };
 
   return (
@@ -731,17 +794,25 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
               {totalEntities > 0 && ` / ${totalEntities}`}
             </Typography>
             <Slider
-              value={maxEntities}
-              onChange={(_, value) => onMaxEntitiesChange(value as number)}
-              min={0}
-              max={Math.max(totalEntities, 1000)}
+              value={sliderValue}
+              onChange={(_, value) => {
+                setIsSliderDragging(true);
+                setDragSliderValue(value as number);
+              }}
+              onChangeCommitted={(_, value) => {
+                setIsSliderDragging(false);
+                setDragSliderValue(null);
+                onMaxEntitiesChange(fromSliderValue(value as number));
+              }}
+              min={sliderMin}
+              max={sliderMax}
               step={50}
               marks={[
-                { value: 0, label: "All" },
-                { value: 500, label: "500" },
+                { value: sliderMin, label: String(sliderMin) },
+                { value: sliderMax, label: "All" },
               ]}
               valueLabelDisplay="auto"
-              valueLabelFormat={(value) => (value === 0 ? "All" : value)}
+              valueLabelFormat={(value) => (value >= sliderMax ? "All" : value)}
               disabled={apiSearchResults !== null}
             />
           </Box>
@@ -783,18 +854,19 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
 
       {graphType === "2d" ? (
         <ForceGraph2D
+          key={graphRenderKey}
           ref={graphRef}
-          graphData={graphData}
+          graphData={displayGraphData}
           nodeAutoColorBy="type"
           nodeRelSize={NODE_R}
-          autoPauseRedraw={false}
+          nodeVal={(node) => getNodeSize(node as CustomNode)}
           linkWidth={(link) =>
             showHighlight && highlightLinks.has(link) ? 5 : 1
           }
-          linkDirectionalParticles={showHighlight ? 4 : 0}
-          linkDirectionalParticleWidth={(link) =>
+          linkDirectionalParticles={(link) =>
             showHighlight && highlightLinks.has(link) ? 4 : 0
           }
+          linkDirectionalParticleWidth={4}
           linkDirectionalParticleColor={
             showHighlight ? getlinkDirectionalParticleColor : undefined
           }
@@ -802,8 +874,8 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             showHighlight && highlightNodes.has(node)
               ? "before"
               : showLabels
-              ? "after"
-              : undefined
+                ? "after"
+                : undefined
           }
           nodeCanvasObject={(node, ctx) => {
             if (showHighlight && highlightNodes.has(node)) {
@@ -854,11 +926,13 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
         />
       ) : (
         <ForceGraph3D
+          key={graphRenderKey}
           ref={graphRef}
           extraRenderers={extraRenderers}
-          graphData={graphData}
+          graphData={displayGraphData}
           nodeAutoColorBy="type"
           nodeRelSize={NODE_R}
+          nodeVal={(node) => getNodeSize(node as CustomNode)}
           linkWidth={(link) =>
             showHighlight && highlightLinks.has(link) ? 5 : 1
           }

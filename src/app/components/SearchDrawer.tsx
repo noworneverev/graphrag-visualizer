@@ -89,25 +89,22 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {searchResults
-                    .filter((item) => "neighbors" in item)
-                    .map((node) => (
+                  {searchResults.map((item) => {
+                    if (!("neighbors" in item)) return null;
+                    const node = item as CustomNode;
+                    return (
                       <TableRow key={node.id}>
                         <TableCell>{node.name}</TableCell>
                         <TableCell>{node.type}</TableCell>
                         <TableCell>
                           <Box display="flex" justifyContent="space-between">
                             <Button
-                              onClick={() =>
-                                handleFocusButtonClick(node as CustomNode)
-                              }
+                              onClick={() => handleFocusButtonClick(node)}
                             >
                               Focus
                             </Button>
                             <Button
-                              onClick={() =>
-                                handleNodeClick(node as CustomNode)
-                              }
+                              onClick={() => handleNodeClick(node)}
                               sx={{ marginLeft: 1 }}
                             >
                               Details
@@ -115,7 +112,8 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({
                           </Box>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -140,9 +138,10 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {searchResults
-                    .filter((item) => "source" in item && "target" in item)
-                    .map((link) => (
+                  {searchResults.map((item) => {
+                    if (!("source" in item && "target" in item)) return null;
+                    const link = item as CustomLink;
+                    return (
                       <TableRow key={link.id}>
                         <TableCell>
                           {typeof link.source === "object"
@@ -158,16 +157,12 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({
                         <TableCell>
                           <Box display="flex" justifyContent="space-between">
                             <Button
-                              onClick={() =>
-                                handleFocusLinkClick(link as CustomLink)
-                              }
+                              onClick={() => handleFocusLinkClick(link)}
                             >
                               Focus
                             </Button>
                             <Button
-                              onClick={() =>
-                                handleLinkClick(link as CustomLink)
-                              }
+                              onClick={() => handleLinkClick(link)}
                               sx={{ marginLeft: 1 }}
                             >
                               Details
@@ -175,7 +170,8 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({
                           </Box>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

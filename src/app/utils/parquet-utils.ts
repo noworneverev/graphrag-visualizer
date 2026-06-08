@@ -34,52 +34,62 @@ export const readParquetFile = async (
     return new Promise((resolve, reject) => {
       const options: ParquetReadOptions = {
         file: asyncBuffer,
-        rowFormat: 'object',
-        onComplete: (rows: Record<string, any>[]) => {          
+        rowFormat: "object",
+        onComplete: (rows: Record<string, any>[]) => {
           if (schema === "entity") {
-            
             resolve(
-              rows.map((row) => ({         
-                id: row["id"],                
-                human_readable_id: parseValue(row["human_readable_id"], "number"),
+              rows.map((row) => ({
+                id: row["id"],
+                human_readable_id: parseValue(
+                  row["human_readable_id"],
+                  "number"
+                ),
                 title: row["title"],
                 type: row["type"],
                 description: row["description"],
                 text_unit_ids: row["text_unit_ids"],
-
               }))
             );
           } else if (schema === "relationship") {
             resolve(
               rows.map((row) => ({
                 id: row["id"],
-                human_readable_id: parseValue(row["human_readable_id"], "number"),                
+                human_readable_id: parseValue(
+                  row["human_readable_id"],
+                  "number"
+                ),
                 source: row["source"],
                 target: row["target"],
                 description: row["description"],
                 weight: row["weight"],
-                combined_degree: parseValue(row["combined_degree"], "number"),                
+                combined_degree: parseValue(row["combined_degree"], "number"),
                 text_unit_ids: row["text_unit_ids"],
-                type: "RELATED", // Custom field to match neo4j            
+                type: "RELATED", // Custom field to match neo4j
               }))
             );
           } else if (schema === "document") {
             resolve(
               rows.map((row) => ({
                 id: row["id"],
-                human_readable_id: parseValue(row["human_readable_id"], "number"),                
+                human_readable_id: parseValue(
+                  row["human_readable_id"],
+                  "number"
+                ),
                 title: row["title"],
                 text: row["text"],
-                text_unit_ids: row["text_unit_ids"],           
+                text_unit_ids: row["text_unit_ids"],
               }))
             );
           } else if (schema === "text_unit") {
             resolve(
               rows.map((row) => ({
                 id: row["id"],
-                human_readable_id: parseValue(row["human_readable_id"], "number"),                
+                human_readable_id: parseValue(
+                  row["human_readable_id"],
+                  "number"
+                ),
                 text: row["text"],
-                n_tokens: parseValue(row["n_tokens"], "number"),                
+                n_tokens: parseValue(row["n_tokens"], "number"),
                 document_ids: row["document_ids"],
                 entity_ids: row["entity_ids"],
                 relationship_ids: row["relationship_ids"],
@@ -89,15 +99,18 @@ export const readParquetFile = async (
             resolve(
               rows.map((row) => ({
                 id: row["id"],
-                human_readable_id: parseValue(row["human_readable_id"], "number"),     
+                human_readable_id: parseValue(
+                  row["human_readable_id"],
+                  "number"
+                ),
                 community: parseValue(row["community"], "number"),
-                parent: parseValue(row["parent"], "number"),                
-                level: parseValue(row["level"], "number"),                
+                parent: parseValue(row["parent"], "number"),
+                level: parseValue(row["level"], "number"),
                 title: row["title"],
                 entity_ids: row["entity_ids"],
                 relationship_ids: row["relationship_ids"],
                 text_unit_ids: row["text_unit_ids"],
-                period: row["period"],                
+                period: row["period"],
                 size: parseValue(row["size"], "number"),
               }))
             );
@@ -105,10 +118,13 @@ export const readParquetFile = async (
             resolve(
               rows.map((row) => ({
                 id: row["id"],
-                human_readable_id: parseValue(row["human_readable_id"], "number"),
-                community: parseValue(row["community"], "number"),       
+                human_readable_id: parseValue(
+                  row["human_readable_id"],
+                  "number"
+                ),
+                community: parseValue(row["community"], "number"),
                 parent: parseValue(row["parent"], "number"),
-                level: parseValue(row["level"], "number"),                
+                level: parseValue(row["level"], "number"),
                 title: row["title"],
                 summary: row["summary"],
                 full_content: row["full_content"],
@@ -116,15 +132,18 @@ export const readParquetFile = async (
                 rank_explanation: row["rank_explanation"],
                 findings: row["findings"],
                 full_content_json: row["full_content_json"],
-                period: row["period"],                
-                size: parseValue(row["size"], "number"),            
+                period: row["period"],
+                size: parseValue(row["size"], "number"),
               }))
             );
           } else if (schema === "covariate") {
             resolve(
               rows.map((row) => ({
                 id: row["id"],
-                human_readable_id: parseValue(row["human_readable_id"], "number"),                
+                human_readable_id: parseValue(
+                  row["human_readable_id"],
+                  "number"
+                ),
                 covariate_type: row["covariate_type"],
                 type: row["type"],
                 description: row["description"],
@@ -134,13 +153,13 @@ export const readParquetFile = async (
                 start_date: row["start_date"],
                 end_date: row["end_date"],
                 source_text: row["source_text"],
-                text_unit_id: row["text_unit_id"],              
+                text_unit_id: row["text_unit_id"],
               }))
             );
           } else {
             resolve(
               rows.map((row: Record<string, any>) => ({
-                ...row
+                ...row,
               }))
             );
           }

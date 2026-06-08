@@ -10,11 +10,22 @@ import useGraphData from "../hooks/useGraphData";
 import DataTableContainer from "./DataTableContainer";
 import ReactGA from "react-ga4";
 
+const getTabIndexFromPathname = (pathname: string): number => {
+  switch (pathname) {
+    case "/graph":
+      return 1;
+    case "/data":
+      return 2;
+    default:
+      return 0;
+  }
+};
+
 const GraphDataHandler: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [tabIndex, setTabIndex] = useState(0);
+  const tabIndex = getTabIndexFromPathname(location.pathname);
   const [graphType, setGraphType] = useState<"2d" | "3d">("2d");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedTable, setSelectedTable] = useState<
@@ -56,7 +67,7 @@ const GraphDataHandler: React.FC = () => {
     includeTextUnits,
     includeCommunities,
     includeCovariates,
-    maxEntities
+    maxEntities,
   );
 
   const hasDocuments = documents.length > 0;
@@ -80,23 +91,6 @@ const GraphDataHandler: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    // **Set tab index based on the current path**
-    switch (location.pathname) {
-      case "/upload":
-        setTabIndex(0);
-        break;
-      case "/graph":
-        setTabIndex(1);
-        break;
-      case "/data":
-        setTabIndex(2);
-        break;
-      default:
-        setTabIndex(0);
-    }
-  }, [location.pathname]);
-
   const onDrop = (acceptedFiles: File[]) => {
     handleFilesRead(acceptedFiles);
     navigate("/graph", { replace: true });
@@ -111,8 +105,7 @@ const GraphDataHandler: React.FC = () => {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setTabIndex(newValue);
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     let path = "/upload";
     if (newValue === 1) path = "/graph";
     if (newValue === 2) path = "/data";
@@ -135,7 +128,7 @@ const GraphDataHandler: React.FC = () => {
 
   return (
     <>
-      <Tabs value={tabIndex} onChange={handleChange} centered>
+      <Tabs value={tabIndex} onChange={handleTabChange} centered>
         <Tab label="Upload Artifacts" />
         <Tab label="Graph Visualization" />
         <Tab label="Data Tables" />
