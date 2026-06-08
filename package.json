@@ -16,6 +16,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "axios": "^1.7.2",
+    "d3-force": "^3.0.0",
     "fuse.js": "^7.0.0",
     "hyparquet": "^1.6.4",
     "material-react-table": "^2.13.1",
@@ -40,7 +41,8 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "doctor": "npx react-doctor@latest"
   },
   "eslintConfig": {
     "extends": [
@@ -61,8 +63,10 @@
     ]
   },
   "devDependencies": {
+    "@types/d3-force": "^3.0.10",
     "@types/react-table": "^7.7.20",
     "@types/three": "^0.167.1",
-    "gh-pages": "^6.1.1"
+    "gh-pages": "^6.1.1",
+    "react-doctor": "^0.2.14"
   }
 }

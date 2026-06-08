@@ -58,14 +58,13 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
   }>({});
 
   useEffect(() => {
-    // Initialize the expandedTables state to false for all keys in context_data
-    if (apiSearchResults && apiSearchResults.context_data) {
-      const initialExpandedState: { [key: string]: boolean } = {};
-      Object.keys(apiSearchResults.context_data).forEach((key) => {
-        initialExpandedState[key] = true;
-      });
-      setExpandedTables(initialExpandedState);
-    }
+    setExpandedTables(
+      apiSearchResults?.context_data
+        ? Object.fromEntries(
+            Object.keys(apiSearchResults.context_data).map((key) => [key, true]),
+          )
+        : {},
+    );
   }, [apiSearchResults]);
 
   const handleSearch = async (searchType: "local" | "global") => {
@@ -218,9 +217,8 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
             {/* Context Data Tables */}
             {apiSearchResults &&
               apiSearchResults.context_data &&
-              Object.entries(apiSearchResults.context_data).map(
-                ([key, data], index) => (
-                  <Card sx={{ marginTop: 2 }} key={index}>
+              Object.entries(apiSearchResults.context_data).map(([key, data]) => (
+                  <Card sx={{ marginTop: 2 }} key={key}>
                     <CardHeader
                       title={key.charAt(0).toUpperCase() + key.slice(1)}
                       action={
@@ -244,30 +242,34 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
                             <Table size="small">
                               <TableHead>
                                 <TableRow>
-                                  {Object.keys(data[0]).map(
-                                    (columnName, idx) => (
-                                      <TableCell key={idx}>
-                                        {columnName.charAt(0).toUpperCase() +
-                                          columnName.slice(1)}
-                                      </TableCell>
-                                    )
-                                  )}
+                                  {Object.keys(data[0]).map((columnName) => (
+                                    <TableCell key={columnName}>
+                                      {columnName.charAt(0).toUpperCase() +
+                                        columnName.slice(1)}
+                                    </TableCell>
+                                  ))}
                                 </TableRow>
                               </TableHead>
                               <TableBody>
-                                {data.map((row, rowIndex) => (
-                                  <TableRow key={rowIndex}>
-                                    {Object.values(row).map(
-                                      (value, cellIndex) => (
-                                        <TableCell key={cellIndex}>
-                                          {typeof value === "string"
-                                            ? value
-                                            : JSON.stringify(value, null, 2)}
-                                        </TableCell>
-                                      )
-                                    )}
-                                  </TableRow>
-                                ))}
+                                {data.map((row, rowIndex) => {
+                                  const rowKey =
+                                    row.id != null
+                                      ? String(row.id)
+                                      : `${key}-${rowIndex}`;
+                                  return (
+                                    <TableRow key={rowKey}>
+                                      {Object.entries(row).map(
+                                        ([columnName, value]) => (
+                                          <TableCell key={columnName}>
+                                            {typeof value === "string"
+                                              ? value
+                                              : JSON.stringify(value, null, 2)}
+                                          </TableCell>
+                                        ),
+                                      )}
+                                    </TableRow>
+                                  );
+                                })}
                               </TableBody>
                             </Table>
                           </TableContainer>
@@ -279,8 +281,7 @@ const APISearchDrawer: React.FC<APISearchDrawerProps> = ({
                       </CardContent>
                     </Collapse>
                   </Card>
-                )
-              )}
+                ))}
           </>
         )}
       </Box>

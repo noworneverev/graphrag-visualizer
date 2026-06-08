@@ -30,8 +30,8 @@ const baseMapping: { [key: string]: string } = {
 };
 
 const fileSchemas: { [key: string]: string } = {};
-Object.entries(baseMapping).forEach(([key, value]) => {  
-  fileSchemas[key] = value;  
+Object.entries(baseMapping).forEach(([key, value]) => {
+  fileSchemas[key] = value;
   fileSchemas[`create_final_${key}`] = value;
 });
 
@@ -62,8 +62,9 @@ const useFileHandler = () => {
 
     for (const file of files) {
       const fileName =
-        typeof file === "string" ? file.split("/").pop()! : file.name;      
-      const schema = fileSchemas[fileName] || fileSchemas[`create_final_${fileName}`];
+        typeof file === "string" ? file.split("/").pop()! : file.name;
+      const schema =
+        fileSchemas[fileName] || fileSchemas[`create_final_${fileName}`];
 
       let data;
       if (typeof file === "string") {
@@ -150,16 +151,17 @@ const useFileHandler = () => {
     const filesToLoad = [];
 
     for (const baseName of baseFileNames) {
-      const prefixedPath = process.env.PUBLIC_URL + `/artifacts/create_final_${baseName}`;
+      const prefixedPath =
+        process.env.PUBLIC_URL + `/artifacts/create_final_${baseName}`;
       const unprefixedPath = process.env.PUBLIC_URL + `/artifacts/${baseName}`;
-  
+
       if (await checkFileExists(prefixedPath)) {
         filesToLoad.push(prefixedPath);
       } else if (await checkFileExists(unprefixedPath)) {
         filesToLoad.push(unprefixedPath);
       }
     }
-    
+
     if (filesToLoad.length > 0) {
       await loadFiles(filesToLoad);
       navigate("/graph", { replace: true });
