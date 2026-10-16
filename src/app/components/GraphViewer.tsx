@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, useMemo, useContext } from "react";
 import ForceGraph2D from "react-force-graph-2d";
 import ForceGraph3D from "react-force-graph-3d";
 import {
@@ -15,12 +15,16 @@ import {
   IconButton,
   Slider,
   Switch,
+  TextField,
   Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
+import { alpha } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Fuse from "fuse.js";
@@ -28,7 +32,6 @@ import {
   CSS2DRenderer,
   CSS2DObject,
 } from "three/examples/jsm/renderers/CSS2DRenderer";
-import * as THREE from "three";
 import { Renderer } from "three";
 import SearchDrawer from "./SearchDrawer";
 import DetailDrawer from "./DetailDrawer";
@@ -36,6 +39,11 @@ import { SearchResult } from "../models/search-result";
 import agent from "../api/agent";
 import APISearchDrawer from "./APISearchDrawer";
 import SpriteText from "three-spritetext";
+import GraphViewControls from "./GraphViewControls";
+import { buildGraphView, GroupMode } from "../utils/graph-view";
+import { LoadedFile } from "../models/loaded-file";
+import useElementSize from "../hooks/useElementSize";
+import { ThemeModeContext } from "../layout/ThemeModeContext";
 
 type Coords = {
   x: number;
@@ -64,6 +72,12 @@ interface GraphViewerProps {
   maxEntities: number;
   onMaxEntitiesChange: React.Dispatch<React.SetStateAction<number>>;
   totalEntities: number;
+  maxNodes: number;
+  onMaxNodesChange: (value: number) => void;
+  maxLinks: number;
+  onMaxLinksChange: (value: number) => void;
+  totalRelationships?: number;
+  loadedFiles?: LoadedFile[];
 }
 
 const NODE_R = 8;
@@ -89,8 +103,16 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   maxEntities,
   onMaxEntitiesChange,
   totalEntities,
+  maxNodes,
+  onMaxNodesChange,
+  maxLinks,
+  onMaxLinksChange,
+  totalRelationships = data.links.length,
+  loadedFiles = [],
 }) => {
   const theme = useTheme();
+  const toggleTheme = useContext(ThemeModeContext);
+  const { ref: containerRef, width, height } = useElementSize();
   const [highlightNodes, setHighlightNodes] = useState<Set<CustomNode>>(
     new Set()
   );
@@ -115,9 +137,13 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   const [showLinkLabels, setShowLinkLabels] = useState(false);
   const [showHighlight, setShowHighlight] = useState(true);
   const graphRef = useRef<any>();
-  const extraRenderers = [new CSS2DRenderer() as any as Renderer];
-  const nodeCount = data.nodes.length;
-  const linkCount = data.links.length;
+  const fitPending = useRef(true);
+  const extraRenderers = useMemo(() => [new CSS2DRenderer() as any as Renderer], []);
+  const [entityLimitDraft, setEntityLimitDraft] = useState(maxEntities);
+  const [nodeLimitDraft, setNodeLimitDraft] = useState(String(maxNodes));
+  const [linkLimitDraft, setLinkLimitDraft] = useState(String(maxLinks));
+  const [linkSpacing, setLinkSpacing] = useState(1);
+  const [linkSpacingDraft, setLinkSpacingDraft] = useState(1);
 
   const [apiDrawerOpen, setApiDrawerOpen] = useState(false);
   const [apiSearchResults, setApiSearchResults] = useState<SearchResult | null>(
@@ -126,12 +152,73 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   const [serverUp, setServerUp] = useState<boolean>(false);
 
   const [graphData, setGraphData] = useState<CustomGraphData>(data);
+  const [showHubs, setShowHubs] = useState(false);
+  const [hiddenLinkTypes, setHiddenLinkTypes] = useState<Set<string>>(new Set());
+  const [groupMode, setGroupMode] = useState<GroupMode>("none");
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [focusNodeId, setFocusNodeId] = useState<string | null>(null);
+  const view = useMemo(() => buildGraphView(graphData, {
+    showHubs, hiddenLinkTypes, groupMode, expandedGroups, focusNodeId,
+  }), [graphData, showHubs, hiddenLinkTypes, groupMode, expandedGroups, focusNodeId]);
+  const nodeValue = useCallback((node: CustomNode) => node.memberCount ? Math.min(16, 1 + Math.log2(node.memberCount)) : 1, []);
+  const nodeColor = useCallback((node: CustomNode) => node.color || "#7F7F7F", []);
+  const linkLabel = useCallback((link: CustomLink) => link.representedLinkCount === undefined
+    ? link.type : `${link.type}: ${link.representedLinkCount} source links (grouped)`, []);
+  const fitGraph = useCallback(() => {
+    graphRef.current?.zoomToFit?.(400, Math.min(160, width * 0.1, height * 0.1));
+  }, [width, height]);
+  const handleEngineStop = useCallback(() => {
+    if (!fitPending.current) return;
+    fitPending.current = false;
+    fitGraph();
+  }, [fitGraph]);
+
+  useEffect(() => {
+    fitPending.current = true;
+  }, [view.data, graphType]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(fitGraph);
+    return () => cancelAnimationFrame(frame);
+  }, [fitGraph, graphType, isFullscreen]);
+
+  const toggleGroup = (key: string) => setExpandedGroups(previous => {
+    const next = new Set(previous);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    return next;
+  });
+
+  useEffect(() => {
+    setHighlightNodes(new Set());
+    setHighlightLinks(new Set());
+    setHoverNode(null);
+    setBottomDrawerOpen(false);
+  }, [view.data]);
+
+  useEffect(() => setEntityLimitDraft(maxEntities), [maxEntities]);
+  useEffect(() => setNodeLimitDraft(String(maxNodes)), [maxNodes]);
+  useEffect(() => setLinkLimitDraft(String(maxLinks)), [maxLinks]);
+
+  useEffect(() => {
+    const linkForce = graphRef.current?.d3Force("link");
+    if (linkForce) {
+      linkForce.distance(30 * linkSpacing);
+      graphRef.current.d3ReheatSimulation();
+    }
+  }, [graphType, view.data, linkSpacing]);
 
   const initialGraphData = useRef<CustomGraphData>(data);
 
   useEffect(() => {
     setGraphData(data);
     initialGraphData.current = data;
+    setSelectedNode(null);
+    setSelectedRelationship(null);
+    setFocusNodeId(null);
+    setExpandedGroups(new Set());
+    setHiddenLinkTypes(new Set());
+    setApiSearchResults(null);
   }, [data]);
 
   useEffect(() => {
@@ -243,7 +330,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     setGraphData(updatedGraphData);
   };
 
-  const fuse = new Fuse([...data.nodes, ...data.links], {
+  const fuse = useMemo(() => new Fuse([...view.data.nodes, ...view.data.links], {
     keys: [
       "uuid",
       "id",
@@ -256,7 +343,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       "summary",
     ],
     threshold: 0.3,
-  });
+  }), [view.data]);
 
   const handleNodeHover = useCallback((node: CustomNode | null) => {
     const newHighlightNodes = new Set<CustomNode>();
@@ -319,31 +406,25 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   };
 
   const handleFocusButtonClick = (node: CustomNode) => {
-    const newHighlightNodes = new Set<CustomNode>();
-    newHighlightNodes.add(node);
-    node.neighbors?.forEach((neighbor) => newHighlightNodes.add(neighbor));
-    node.links?.forEach((link) => highlightLinks.add(link));
-
-    setHighlightNodes(newHighlightNodes);
-    setHoverNode(node);
-
-    if (graphRef.current) {
+    if (node.groupKey) {
+      toggleGroup(node.groupKey);
+      setRightDrawerOpen(false);
+      return;
+    }
+    handleNodeHover(node);
+    setSelectedNode(node);
+    if (graphRef.current && node.x !== undefined && node.y !== undefined) {
       if (graphType === "2d") {
         graphRef.current.centerAt(node.x, node.y, 1000);
         graphRef.current.zoom(8, 1000);
       } else {
         graphRef.current.cameraPosition(
-          { x: node.x, y: node.y, z: 300 }, // new position
-          { x: node.x, y: node.y, z: 0 }, // lookAt
-          3000 // ms transition duration
+          { x: node.x, y: node.y, z: (node.z || 0) + 300 },
+          { x: node.x, y: node.y, z: node.z || 0 },
+          1000
         );
       }
     }
-
-    // Simulate mouse hover on the focused node
-    setTimeout(() => {
-      handleNodeHover(node);
-    }, 1000); // Adjust delay as needed
 
     setRightDrawerOpen(false);
   };
@@ -402,6 +483,10 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   };
 
   const handleNodeClick = (node: CustomNode) => {
+    if (node.groupKey) {
+      toggleGroup(node.groupKey);
+      return;
+    }
     setSelectedRelationship(null);
     setSelectedNode(node);
     setLinkedNodes(node.neighbors || []);
@@ -420,8 +505,8 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       typeof link.target === "object"
         ? (link.target as CustomNode).id
         : link.target;
-    const sourceNode = data.nodes.find((node) => node.id === linkSource);
-    const targetNode = data.nodes.find((node) => node.id === linkTarget);
+    const sourceNode = view.data.nodes.find((node) => node.id === linkSource);
+    const targetNode = view.data.nodes.find((node) => node.id === linkTarget);
     if (sourceNode && targetNode) {
       const linkedNodes = [sourceNode, targetNode];
       setLinkedNodes(linkedNodes);
@@ -431,20 +516,29 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     }
   };
 
-  const getBackgroundColor = () =>
-    theme.palette.mode === "dark" ? "#000000" : "#FFFFFF";
+  const getBackgroundColor = () => theme.palette.background.default;
 
   const getLinkColor = (link: CustomLink) =>
     theme.palette.mode === "dark" ? "gray" : "lightgray";
 
-  const get3DLinkColor = (link: CustomLink) =>
-    theme.palette.mode === "dark" ? "lightgray" : "gray";
+  const get3DLinkColor = useCallback((link: CustomLink) =>
+    showHighlight && highlightLinks.has(link)
+      ? "orange"
+      : theme.palette.mode === "dark" ? "lightgray" : "gray",
+    [showHighlight, highlightLinks, theme.palette.mode]
+  );
+
+  const particleLinks = useMemo(() => new Set(Array.from(highlightLinks).slice(0, 100)), [highlightLinks]);
+  const get3DParticleCount = useCallback((link: CustomLink) =>
+    showHighlight && particleLinks.has(link) ? 2 : 0,
+    [showHighlight, particleLinks]
+  );
 
   const getlinkDirectionalParticleColor = (link: CustomLink) =>
     theme.palette.mode === "dark" ? "lightgray" : "gray";
 
   const renderNodeLabel = (node: CustomNode, ctx: CanvasRenderingContext2D) => {
-    if (!showLabels) return; // Only render the label if showLabels is true
+    if (!showLabels && !node.groupKey) return;
 
     const label = node.name || "";
     const fontSize = 4;
@@ -462,7 +556,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
     const boxWidth = textWidth + padding * 2;
     const boxHeight = fontSize + padding * 2;
 
-    if (node.x && node.y) {
+    if (node.x !== undefined && node.y !== undefined) {
       // Draw the background rectangle with rounded corners
       ctx.fillStyle = backgroundColor;
       ctx.beginPath();
@@ -498,35 +592,48 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       ctx.closePath();
       ctx.fill();
 
-      // Draw the text in the center of the node
-      // ctx.fillStyle = textColor;
-      ctx.fillStyle = node.color;
+      ctx.fillStyle = theme.palette.text.primary;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(label, node.x, node.y);
     }
   };
 
-  const nodeThreeObject = (node: CustomNode) => {
-    if (!showLabels) {
-      return new THREE.Object3D();
-    }
-
+  const nodeThreeObject = useCallback((node: CustomNode) => {
     try {
       const nodeEl = document.createElement("div");
-      nodeEl.textContent = node.name || node.id; // Use either name or id for the label
-      nodeEl.style.color = node.color;
+      nodeEl.textContent = node.name || node.id;
+      nodeEl.style.color = theme.palette.text.primary;
+      nodeEl.style.backgroundColor = alpha(theme.palette.background.paper, 0.88);
       nodeEl.style.padding = "2px 4px";
       nodeEl.style.borderRadius = "4px";
-      nodeEl.style.fontSize = "10px";
+      nodeEl.style.fontSize = "12px";
       nodeEl.className = "node-label";
 
       return new CSS2DObject(nodeEl);
     } catch (error) {
       console.error("Error creating 3D object:", error);
-      return new THREE.Object3D(); // Fallback in case of error
+      return new CSS2DObject(document.createElement("div"));
     }
-  };
+  }, [theme.palette.text.primary, theme.palette.background.paper]);
+
+  const groupNodeThreeObject = useCallback((node: CustomNode) =>
+    node.groupKey ? nodeThreeObject(node) : undefined, [nodeThreeObject]);
+
+  const linkThreeObject = useCallback((link: CustomLink) => {
+    const sprite = new SpriteText(`${link.type}`);
+    sprite.color = theme.palette.text.primary;
+    sprite.textHeight = 1.5;
+    return sprite;
+  }, [theme.palette.text.primary]);
+
+  const linkPositionUpdate = useCallback((sprite: any, { start, end }: { start: Coords; end: Coords }) => {
+    sprite.position.set(
+      (start.x + end.x) / 2,
+      (start.y + end.y) / 2,
+      (start.z + end.z) / 2
+    );
+  }, []);
 
   const localSearchEnabled = hasCovariates
     ? includeTextUnits && includeCommunities && includeCovariates
@@ -539,9 +646,11 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
 
   return (
     <Box
+      ref={containerRef}
+      data-testid="graph-viewport"
       sx={{
-        height: isFullscreen ? "100vh" : "calc(100vh - 64px)",
-        width: isFullscreen ? "100vw" : "100%",
+        height: isFullscreen ? "100dvh" : "100%",
+        width: "100%",
         position: isFullscreen ? "fixed" : "relative",
         top: 0,
         left: 0,
@@ -562,6 +671,12 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           flexDirection: "column",
           gap: 2,
           alignItems: "flex-end",
+          maxHeight: "calc(100% - 20px)",
+          overflowY: "auto",
+          paddingRight: 1,
+          padding: 2,
+          borderRadius: 1,
+          backgroundColor: theme.palette.background.paper,
         }}
       >
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
@@ -613,8 +728,34 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
               {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
             </IconButton>
           </Tooltip>
+          <Tooltip title={`Switch to ${theme.palette.mode === "dark" ? "light" : "dark"} mode`}>
+            <IconButton aria-label={`Switch to ${theme.palette.mode === "dark" ? "light" : "dark"} mode`}
+              onClick={toggleTheme} color="inherit">
+              {theme.palette.mode === "dark" ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
+            </IconButton>
+          </Tooltip>
         </Box>
 
+        <GraphViewControls
+          showHubs={showHubs} onShowHubsChange={setShowHubs}
+          hubCount={view.hubCount} hubThreshold={view.hubThreshold}
+          types={view.types} hiddenTypes={hiddenLinkTypes}
+          onToggleType={type => setHiddenLinkTypes(previous => {
+            const next = new Set(previous);
+            if (next.has(type)) next.delete(type); else next.add(type);
+            return next;
+          })}
+          groupMode={groupMode} onGroupModeChange={setGroupMode}
+          hasCommunities={graphData.nodes.some(node => node.communityId !== undefined)}
+          groups={view.groups} expandedGroups={expandedGroups} onToggleGroup={toggleGroup}
+          onCollapseAll={() => setExpandedGroups(new Set())}
+          onExpandAll={() => setExpandedGroups(new Set(view.groups.map(group => group.key)))}
+          selectedName={selectedNode?.name}
+          focusName={focusNodeId === null ? undefined : graphData.nodes.find(node => node.id === focusNodeId)?.name || focusNodeId}
+          onFocus={() => { if (selectedNode) setFocusNodeId(selectedNode.id); }}
+          onClearFocus={() => setFocusNodeId(null)}
+          onFit={() => { fitPending.current = false; fitGraph(); }}
+        />
         <Box
           sx={{
             display: "flex",
@@ -727,12 +868,14 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
         {totalEntities > 0 && (
           <Box sx={{ width: 200, mt: 2 }}>
             <Typography variant="body2" gutterBottom>
-              Max Entities: {maxEntities === 0 ? "All" : maxEntities}
+              Max Entities: {entityLimitDraft === 0 ? "All" : entityLimitDraft}
               {totalEntities > 0 && ` / ${totalEntities}`}
             </Typography>
             <Slider
-              value={maxEntities}
-              onChange={(_, value) => onMaxEntitiesChange(value as number)}
+              aria-label="Max Entities"
+              value={entityLimitDraft}
+              onChange={(_, value) => setEntityLimitDraft(value as number)}
+              onChangeCommitted={(_, value) => onMaxEntitiesChange(value as number)}
               min={0}
               max={Math.max(totalEntities, 1000)}
               step={50}
@@ -746,6 +889,54 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
             />
           </Box>
         )}
+        <Box sx={{ width: 200 }}>
+          <Typography variant="body2">Link spacing: {linkSpacingDraft}×</Typography>
+          <Slider
+            aria-label="Link spacing"
+            value={linkSpacingDraft}
+            min={0.25}
+            max={10}
+            step={0.25}
+            onChange={(_, value) => setLinkSpacingDraft(value as number)}
+            onChangeCommitted={(_, value) => setLinkSpacing(value as number)}
+            valueLabelDisplay="auto"
+          />
+          <Typography variant="caption">Higher values spread linked nodes apart.</Typography>
+        </Box>
+        <TextField
+          label="Max total nodes"
+          type="number"
+          size="small"
+          value={nodeLimitDraft}
+          inputProps={{ min: 0, step: 100 }}
+          helperText="0 = All. Includes all node types."
+          disabled={apiSearchResults !== null}
+          onChange={(event) => setNodeLimitDraft(event.target.value)}
+          onBlur={() => {
+            const value = Number(nodeLimitDraft);
+            const limit = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : maxNodes;
+            setNodeLimitDraft(String(limit));
+            onMaxNodesChange(limit);
+          }}
+          onKeyDown={(event) => { if (event.key === "Enter") (event.target as HTMLInputElement).blur(); }}
+        />
+        <TextField
+          label="Max total links"
+          type="number"
+          size="small"
+          value={linkLimitDraft}
+          inputProps={{ min: 0, step: 100 }}
+          helperText="0 = All. Applied after the node limit."
+          disabled={apiSearchResults !== null}
+          onChange={(event) => setLinkLimitDraft(event.target.value)}
+          onBlur={() => {
+            const value = Number(linkLimitDraft);
+            const limit = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : maxLinks;
+            setLinkLimitDraft(String(limit));
+            onMaxLinksChange(limit);
+          }}
+          onKeyDown={(event) => { if (event.key === "Enter") (event.target as HTMLInputElement).blur(); }}
+        />
       </Box>
 
       <APISearchDrawer
@@ -784,32 +975,33 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       {graphType === "2d" ? (
         <ForceGraph2D
           ref={graphRef}
-          graphData={graphData}
-          nodeAutoColorBy="type"
+          width={width}
+          height={height}
+          onEngineStop={handleEngineStop}
+          graphData={view.data}
+          nodeColor={nodeColor}
+          nodeVal={nodeValue}
+          linkLabel={linkLabel}
           nodeRelSize={NODE_R}
           autoPauseRedraw={false}
           linkWidth={(link) =>
             showHighlight && highlightLinks.has(link) ? 5 : 1
           }
-          linkDirectionalParticles={showHighlight ? 4 : 0}
-          linkDirectionalParticleWidth={(link) =>
-            showHighlight && highlightLinks.has(link) ? 4 : 0
-          }
+          linkDirectionalParticles={get3DParticleCount}
+          linkDirectionalParticleWidth={2}
           linkDirectionalParticleColor={
             showHighlight ? getlinkDirectionalParticleColor : undefined
           }
           nodeCanvasObjectMode={(node) =>
-            showHighlight && highlightNodes.has(node)
-              ? "before"
-              : showLabels
+            showLabels || node.groupKey
               ? "after"
-              : undefined
+              : showHighlight && highlightNodes.has(node) ? "before" : undefined
           }
           nodeCanvasObject={(node, ctx) => {
             if (showHighlight && highlightNodes.has(node)) {
               paintRing(node as CustomNode, ctx);
             }
-            if (showLabels) {
+            if (showLabels || node.groupKey) {
               renderNodeLabel(node as CustomNode, ctx);
             }
           }}
@@ -855,18 +1047,20 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
       ) : (
         <ForceGraph3D
           ref={graphRef}
+          width={width}
+          height={height}
+          onEngineStop={handleEngineStop}
           extraRenderers={extraRenderers}
-          graphData={graphData}
-          nodeAutoColorBy="type"
+          graphData={view.data}
+          nodeColor={nodeColor}
+          nodeVal={nodeValue}
+          linkLabel={linkLabel}
           nodeRelSize={NODE_R}
-          linkWidth={(link) =>
-            showHighlight && highlightLinks.has(link) ? 5 : 1
-          }
-          linkDirectionalParticles={showHighlight ? 4 : 0}
-          linkDirectionalParticleWidth={(link) =>
-            showHighlight && highlightLinks.has(link) ? 4 : 0
-          }
-          nodeThreeObject={nodeThreeObject}
+          linkWidth={0}
+          linkDirectionalParticles={get3DParticleCount}
+          linkDirectionalParticleWidth={2}
+          nodeThreeObject={showLabels ? nodeThreeObject
+            : view.collapsedGroupCount > 0 ? groupNodeThreeObject as typeof nodeThreeObject : undefined}
           nodeThreeObjectExtend={true}
           onNodeHover={showHighlight ? handleNodeHover : undefined}
           onLinkHover={showHighlight ? handleLinkHover : undefined}
@@ -874,27 +1068,10 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           onLinkClick={handleLinkClick}
           backgroundColor={getBackgroundColor()}
           linkColor={get3DLinkColor}
+          linkOpacity={theme.palette.mode === "dark" ? 0.45 : 0.35}
           linkThreeObjectExtend={true}
-          linkThreeObject={(link) => {
-            if (!showLinkLabels) new THREE.Object3D();
-            const sprite = new SpriteText(`${link.type}`);
-            sprite.color = "lightgrey";
-            sprite.textHeight = 1.5;
-            return sprite;
-          }}
-          linkPositionUpdate={(sprite, { start, end }) => {
-            if (!showLinkLabels) return;
-
-            const middlePos = ["x", "y", "z"].reduce((acc, c) => {
-              acc[c as keyof Coords] =
-                start[c as keyof Coords] +
-                (end[c as keyof Coords] - start[c as keyof Coords]) / 2;
-              return acc;
-            }, {} as Coords);
-
-            // Position sprite
-            Object.assign(sprite.position, middlePos);
-          }}
+          linkThreeObject={showLinkLabels ? linkThreeObject : undefined}
+          linkPositionUpdate={showLinkLabels ? linkPositionUpdate : undefined}
         />
       )}
       <Box
@@ -907,10 +1084,38 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
           flexDirection: "column",
           alignItems: "flex-start",
           gap: 1,
+          maxWidth: 280,
+          maxHeight: "calc(100% - 20px)",
+          overflowY: "auto",
+          padding: 1,
+          backgroundColor: theme.palette.background.paper,
         }}
       >
-        <Typography variant="body2">Nodes: {nodeCount}</Typography>
-        <Typography variant="body2">Relationships: {linkCount}</Typography>
+        <Typography variant="body2">Loaded entities: {totalEntities}</Typography>
+        <Typography variant="body2">Loaded relationships: {totalRelationships}</Typography>
+        <Typography variant="body2">Before view filters: {graphData.nodes.length} nodes, {graphData.links.length} links</Typography>
+        <Typography variant="body2">Visible: {view.data.nodes.length} dots, {view.data.links.length} links</Typography>
+        {view.collapsedGroupCount > 0 && <Typography variant="body2">
+          Grouped view: {view.collapsedGroupCount} group dots, {view.data.nodes.length - view.collapsedGroupCount} individual nodes.
+          Click a named group to expand it.
+        </Typography>}
+        {groupMode !== "none" && <Button variant="contained" onClick={() => setGroupMode("none")}>
+          Show individual nodes
+        </Button>}
+        {groupMode === "none" && <Button variant="outlined" onClick={() => setGroupMode("auto")}>
+          Show group overview
+        </Button>}
+        {view.groups.length > 0 && <Typography variant="caption">
+          {view.mode === "community" ? "Community" : "Type"} groups represent {view.representedNodes} nodes and {view.representedLinks} links. Internal group links are hidden.
+        </Typography>}
+        {view.data.nodes.length === 0 && <Typography role="status">No nodes match this view. Show hubs or change the filters.</Typography>}
+        <Typography variant="caption">Screen distance does not measure meaning or importance.</Typography>
+        {loadedFiles.length > 0 && <details>
+          <summary>Loaded files ({loadedFiles.length})</summary>
+          {loadedFiles.map(file => <Typography key={file.schema} variant="caption" component="p" sx={{ overflowWrap: "anywhere" }}>
+            {file.path}: {file.rows} rows
+          </Typography>)}
+        </details>}
         <Button
           variant="contained"
           onClick={toggleApiDrawer(true)}

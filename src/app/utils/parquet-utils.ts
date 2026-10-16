@@ -60,7 +60,7 @@ export const readParquetFile = async (
                 weight: row["weight"],
                 combined_degree: parseValue(row["combined_degree"], "number"),                
                 text_unit_ids: row["text_unit_ids"],
-                type: "RELATED", // Custom field to match neo4j            
+                type: row["type"] || "RELATED",
               }))
             );
           } else if (schema === "document") {
@@ -150,6 +150,6 @@ export const readParquetFile = async (
     });
   } catch (err) {
     console.error("Error reading Parquet file", err);
-    return [];
+    throw err;
   }
 };

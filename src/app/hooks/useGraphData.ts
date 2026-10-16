@@ -7,6 +7,7 @@ import { Community } from "../models/community";
 import { CommunityReport } from "../models/community-report";
 import { Covariate } from "../models/covariate";
 import { CustomGraphData, CustomLink, CustomNode } from "../models/custom-graph-data";
+import { communityNames } from "../utils/community-names";
 
 const useGraphData = (
   entities: Entity[],
@@ -20,7 +21,9 @@ const useGraphData = (
   includeTextUnits: boolean,
   includeCommunities: boolean,
   includeCovariates: boolean,
-  maxEntities: number = 0 // 0 means no limit
+  maxEntities: number = 0,
+  maxNodes: number = 0,
+  maxLinks: number = 0
 ) => {
   
   const [graphData, setGraphData] = useState<CustomGraphData>({ nodes: [], links: [] });  
@@ -59,6 +62,33 @@ const useGraphData = (
 
     const nodesMap: { [key: string]: CustomNode } = {};
     nodes.forEach(node => nodesMap[node.id] = node);
+    const entitiesByUuid = new Map(nodes.map(node => [node.uuid, node]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.id, relationship]));
+    const reportsByCommunity = new Map(communityReports.map(report => [report.community.toString(), report]));
+    const namesByCommunity = communityNames(communities, communityReports, entities, relationships);
+    const orderedCommunities = [...communities].sort((a, b) => a.level - b.level);
+    orderedCommunities.forEach(community => {
+      (community.entity_ids || []).forEach(id => {
+        const node = entitiesByUuid.get(id);
+        if (node && node.communityId === undefined) {
+          node.communityId = String(community.community);
+          node.communityName = namesByCommunity.get(String(community.community));
+        }
+      });
+    });
+    orderedCommunities.forEach(community => {
+      (community.relationship_ids || []).forEach(id => {
+        const relationship = relationshipsById.get(id);
+        if (!relationship) return;
+        [relationship.source, relationship.target].forEach(title => {
+          const node = nodesMap[title];
+          if (node && node.communityId === undefined) {
+            node.communityId = String(community.community);
+            node.communityName = namesByCommunity.get(String(community.community));
+          }
+        });
+      });
+    });
 
     const links: CustomLink[] = relationships
       .map((relationship) => ({
@@ -132,7 +162,7 @@ const useGraphData = (
         .filter((textunit) => (textunit.entity_ids ?? []).length > 0)
         .flatMap((textunit) =>
           textunit.entity_ids.map((entityId) => {
-            const targetName = nodes.find((e) => e.uuid === entityId)?.name;
+            const targetName = entitiesByUuid.get(entityId)?.name;
             return targetName ? {
               source: textunit.id,
               target: targetName,
@@ -148,20 +178,18 @@ const useGraphData = (
 
     if (includeCommunities) {
       const communityNodes = communities.map((community) => {                
-        const report = communityReports.find(
-          (r) => r.community.toString() === community.community.toString()
-        );        
+        const report = reportsByCommunity.get(community.community.toString());
         return {
           uuid: community.id.toString(),
           id: community.id.toString(),
-          name: community.title,
+          name: namesByCommunity.get(String(community.community)) || community.title,
           type: "COMMUNITY",
-          entity_ids: community.text_unit_ids,
+          entity_ids: community.entity_ids,
           relationship_ids: community.relationship_ids,
           full_content: report?.full_content || "",
           level: report?.level || -1,
           rank: report?.rank || -1,
-          title: report?.title || "",
+          title: namesByCommunity.get(String(community.community)) || community.title,
           rank_explanation: report?.rank_explanation || "",
           summary: report?.summary || "",
           findings: report?.findings || [],
@@ -176,7 +204,7 @@ const useGraphData = (
       const communityEntityLinks = communities
         .flatMap((community) =>
           community.relationship_ids.map((relId) => {
-            const relationship = relationships.find((rel) => rel.id === relId);
+            const relationship = relationshipsById.get(relId);
             if (!relationship) return [];
 
             const sourceLinkId = `${relationship.source}-${community.id}`;
@@ -280,7 +308,12 @@ const useGraphData = (
       links.push(...covariateTextUnitLinks);
     }
 
-    links.forEach(link => {
+    const visibleNodes = maxNodes > 0 ? nodes.slice(0, maxNodes) : nodes;
+    const visibleIds = new Set(visibleNodes.map(node => node.id));
+    const validLinks = links.filter(link => visibleIds.has(link.source) && visibleIds.has(link.target));
+    const visibleLinks = maxLinks > 0 ? validLinks.slice(0, maxLinks) : validLinks;
+
+    visibleLinks.forEach(link => {
       const sourceNode = nodesMap[link.source];
       const targetNode = nodesMap[link.target];
       if (sourceNode && targetNode) {
@@ -296,9 +329,7 @@ const useGraphData = (
     });
 
 
-    if (nodes.length > 0) {
-      setGraphData({ nodes, links });
-    }
+    setGraphData({ nodes: visibleNodes, links: visibleLinks });
   }, [
     entities,
     relationships,
@@ -312,6 +343,8 @@ const useGraphData = (
     includeCommunities,
     includeCovariates,
     maxEntities,
+    maxNodes,
+    maxLinks,
   ]);
 
   return graphData;
