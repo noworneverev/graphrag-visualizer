@@ -30,7 +30,7 @@ const GraphDataHandler: React.FC = () => {
   const [includeTextUnits, setIncludeTextUnits] = useState(false);
   const [includeCommunities, setIncludeCommunities] = useState(false);
   const [includeCovariates, setIncludeCovariates] = useState(false);
-  const [maxEntities, setMaxEntities] = useState(500);
+  const [maxEntitiesOverride, setMaxEntitiesOverride] = useState<number | null>(null);
   const [maxNodes, setMaxNodes] = useState(0);
   const [maxLinks, setMaxLinks] = useState(0);
 
@@ -48,6 +48,8 @@ const GraphDataHandler: React.FC = () => {
     loadError,
     isLoading,
   } = useFileHandler();
+
+  const maxEntities = maxEntitiesOverride ?? (communities.length > 0 ? 0 : 500);
 
   const graphData = useGraphData(
     entities,
@@ -172,6 +174,7 @@ const GraphDataHandler: React.FC = () => {
           }}
         >
           <GraphViewer
+            key={loadedFiles.map(file => file.path).join("|") || "empty"}
             data={graphData}
             graphType={graphType}
             isFullscreen={isFullscreen}
@@ -198,7 +201,7 @@ const GraphDataHandler: React.FC = () => {
             hasCommunities={hasCommunities}
             hasCovariates={hasCovariates}
             maxEntities={maxEntities}
-            onMaxEntitiesChange={setMaxEntities}
+            onMaxEntitiesChange={setMaxEntitiesOverride}
             totalEntities={entities.length}
             maxNodes={maxNodes}
             onMaxNodesChange={setMaxNodes}

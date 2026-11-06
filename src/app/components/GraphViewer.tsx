@@ -70,7 +70,7 @@ interface GraphViewerProps {
   hasCommunities: boolean;
   hasCovariates: boolean;
   maxEntities: number;
-  onMaxEntitiesChange: React.Dispatch<React.SetStateAction<number>>;
+  onMaxEntitiesChange: (value: number) => void;
   totalEntities: number;
   maxNodes: number;
   onMaxNodesChange: (value: number) => void;
@@ -110,6 +110,7 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   totalRelationships = data.links.length,
   loadedFiles = [],
 }) => {
+  const autoGroup = hasCommunities && totalEntities >= 1000;
   const theme = useTheme();
   const toggleTheme = useContext(ThemeModeContext);
   const { ref: containerRef, width, height } = useElementSize();
@@ -142,8 +143,8 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
   const [entityLimitDraft, setEntityLimitDraft] = useState(maxEntities);
   const [nodeLimitDraft, setNodeLimitDraft] = useState(String(maxNodes));
   const [linkLimitDraft, setLinkLimitDraft] = useState(String(maxLinks));
-  const [linkSpacing, setLinkSpacing] = useState(1);
-  const [linkSpacingDraft, setLinkSpacingDraft] = useState(1);
+  const [linkSpacing, setLinkSpacing] = useState(autoGroup ? 2 : 1);
+  const [linkSpacingDraft, setLinkSpacingDraft] = useState(autoGroup ? 2 : 1);
 
   const [apiDrawerOpen, setApiDrawerOpen] = useState(false);
   const [apiSearchResults, setApiSearchResults] = useState<SearchResult | null>(
@@ -153,8 +154,10 @@ const GraphViewer: React.FC<GraphViewerProps> = ({
 
   const [graphData, setGraphData] = useState<CustomGraphData>(data);
   const [showHubs, setShowHubs] = useState(false);
-  const [hiddenLinkTypes, setHiddenLinkTypes] = useState<Set<string>>(new Set());
-  const [groupMode, setGroupMode] = useState<GroupMode>("none");
+  const [hiddenLinkTypes, setHiddenLinkTypes] = useState<Set<string>>(
+    new Set(autoGroup ? ["DECLARES"] : [])
+  );
+  const [groupMode, setGroupMode] = useState<GroupMode>(autoGroup ? "auto" : "none");
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [focusNodeId, setFocusNodeId] = useState<string | null>(null);
   const view = useMemo(() => buildGraphView(graphData, {

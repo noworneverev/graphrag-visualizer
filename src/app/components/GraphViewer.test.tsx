@@ -81,6 +81,21 @@ test("Disabled labels do not allocate custom node or link objects", () => {
   expect(SpriteText).not.toHaveBeenCalled();
 });
 
+test("Large saved graphs open grouped with declaration links hidden", () => {
+  const data = {
+    nodes: [
+      { ...nodeA, communityId: "1", communityName: "Session" },
+      { ...nodeB, communityId: "1", communityName: "Session" },
+    ],
+    links: [{ ...link, type: "DECLARES" }],
+  };
+  render(<GraphViewer {...props} data={data} hasCommunities totalEntities={4204} />);
+  expect(screen.getByRole("button", { name: "Show individual nodes" })).toBeInTheDocument();
+  expect(mockGraphProps.graphData.nodes).toHaveLength(1);
+  expect(mockGraphProps.graphData.links).toHaveLength(0);
+  expect(mockDistance).toHaveBeenLastCalledWith(60);
+});
+
 test("Hover preserves the base link width and label factories", () => {
   render(<GraphViewer {...props} />);
   fireEvent.click(screen.getByLabelText("Show Node Labels"));
