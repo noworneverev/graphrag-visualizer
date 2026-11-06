@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import GraphViewer from "./GraphViewer";
-import { Box, Container, Tab, Tabs } from "@mui/material";
+import { Alert, Box, Container, Tab, Tabs, Typography } from "@mui/material";
 import { useDropzone } from "react-dropzone";
 import DropZone from "./DropZone";
 import Introduction from "./Introduction";
@@ -30,7 +30,9 @@ const GraphDataHandler: React.FC = () => {
   const [includeTextUnits, setIncludeTextUnits] = useState(false);
   const [includeCommunities, setIncludeCommunities] = useState(false);
   const [includeCovariates, setIncludeCovariates] = useState(false);
-  const [maxEntities, setMaxEntities] = useState(500);
+  const [maxEntitiesOverride, setMaxEntitiesOverride] = useState<number | null>(null);
+  const [maxNodes, setMaxNodes] = useState(0);
+  const [maxLinks, setMaxLinks] = useState(0);
 
   const {
     entities,
@@ -42,7 +44,12 @@ const GraphDataHandler: React.FC = () => {
     communityReports,
     handleFilesRead,
     loadDefaultFiles,
+    loadedFiles,
+    loadError,
+    isLoading,
   } = useFileHandler();
+
+  const maxEntities = maxEntitiesOverride ?? (communities.length > 0 ? 0 : 500);
 
   const graphData = useGraphData(
     entities,
@@ -56,7 +63,9 @@ const GraphDataHandler: React.FC = () => {
     includeTextUnits,
     includeCommunities,
     includeCovariates,
-    maxEntities
+    maxEntities,
+    maxNodes,
+    maxLinks
   );
 
   const hasDocuments = documents.length > 0;
@@ -97,9 +106,8 @@ const GraphDataHandler: React.FC = () => {
     }
   }, [location.pathname]);
 
-  const onDrop = (acceptedFiles: File[]) => {
-    handleFilesRead(acceptedFiles);
-    navigate("/graph", { replace: true });
+  const onDrop = async (acceptedFiles: File[]) => {
+    if (await handleFilesRead(acceptedFiles)) navigate("/graph", { replace: true });
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -134,12 +142,14 @@ const GraphDataHandler: React.FC = () => {
   };
 
   return (
-    <>
-      <Tabs value={tabIndex} onChange={handleChange} centered>
+    <Box sx={{ height: "100dvh", display: "flex", flexDirection: "column" }}>
+      <Tabs value={tabIndex} onChange={handleChange} centered sx={{ flexShrink: 0 }}>
         <Tab label="Upload Artifacts" />
         <Tab label="Graph Visualization" />
         <Tab label="Data Tables" />
       </Tabs>
+      {isLoading && <Typography role="status" sx={{ px: 3 }}>Loading graph files…</Typography>}
+      {loadError && <Alert severity="error">{loadError} Previous data was kept.</Alert>}
       {tabIndex === 0 && (
         <Container
           maxWidth="md"
@@ -155,18 +165,16 @@ const GraphDataHandler: React.FC = () => {
       )}
       {tabIndex === 1 && (
         <Box
-          p={3}
           sx={{
-            height: isFullscreen ? "100vh" : "calc(100vh - 64px)",
-            width: isFullscreen ? "100vw" : "100%",
-            position: isFullscreen ? "fixed" : "relative",
-            top: 0,
-            left: 0,
-            zIndex: isFullscreen ? 1300 : "auto",
+            flex: 1,
+            minHeight: 0,
+            width: "100%",
+            position: "relative",
             overflow: "hidden",
           }}
         >
           <GraphViewer
+            key={loadedFiles.map(file => file.path).join("|") || "empty"}
             data={graphData}
             graphType={graphType}
             isFullscreen={isFullscreen}
@@ -193,8 +201,14 @@ const GraphDataHandler: React.FC = () => {
             hasCommunities={hasCommunities}
             hasCovariates={hasCovariates}
             maxEntities={maxEntities}
-            onMaxEntitiesChange={setMaxEntities}
+            onMaxEntitiesChange={setMaxEntitiesOverride}
             totalEntities={entities.length}
+            maxNodes={maxNodes}
+            onMaxNodesChange={setMaxNodes}
+            maxLinks={maxLinks}
+            onMaxLinksChange={setMaxLinks}
+            totalRelationships={relationships.length}
+            loadedFiles={loadedFiles}
           />
         </Box>
       )}
@@ -214,7 +228,7 @@ const GraphDataHandler: React.FC = () => {
           />
         </Box>
       )}
-    </>
+    </Box>
   );
 };
 

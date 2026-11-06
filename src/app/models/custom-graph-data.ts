@@ -42,6 +42,10 @@ export interface CustomNode extends NodeObject {
     text_unit_id?: string;
     covariate_type?: string;
     parent?: number;
+    communityId?: string;
+    communityName?: string;
+    groupKey?: string;
+    memberCount?: number;
   }
   
 export interface CustomLink extends LinkObject {
@@ -56,6 +60,7 @@ export interface CustomLink extends LinkObject {
     combined_degree?: number;
     source_degree?: number;
     target_degree?: number;
+    representedLinkCount?: number;
     rank?: number;
   }
   

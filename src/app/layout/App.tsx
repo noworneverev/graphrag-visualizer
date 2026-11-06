@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   HashRouter as Router,
   Routes,
@@ -22,12 +22,13 @@ import {
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import { ThemeModeContext } from "./ThemeModeContext";
 
 const App: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("theme") !== "light");
   const paletteType = darkMode ? "dark" : "light";
 
-  const theme = createTheme({
+  const theme = useMemo(() => createTheme({
     palette: {
       mode: paletteType,
     },
@@ -52,17 +53,12 @@ const App: React.FC = () => {
         },
       },
     },
-  });
+  }), [paletteType]);
 
   function handleThemeChange() {
     setDarkMode(!darkMode);
     localStorage.setItem("theme", darkMode ? "light" : "dark");
   }
-
-  useEffect(() => {
-    const currentTheme = localStorage.getItem("theme");
-    setDarkMode(currentTheme === "dark");
-  }, []);
 
   useEffect(() => {
     const measurementId = process.env.REACT_APP_GA_MEASUREMENT_ID;
@@ -79,8 +75,9 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <ThemeModeContext.Provider value={handleThemeChange}>
       <Router>
-        <Container disableGutters maxWidth={false}>
+        <Container disableGutters maxWidth={false} sx={{ minHeight: "100dvh" }}>
           <CssBaseline />
 
           <Box
@@ -106,15 +103,15 @@ const App: React.FC = () => {
               <GitHubIcon />
             </IconButton>
             {darkMode ? (
-              <Tooltip title="Turn on the light">
-                <IconButton onClick={handleThemeChange} color="inherit">
-                  <DarkModeOutlinedIcon />
+              <Tooltip title="Switch to light mode">
+                <IconButton aria-label="Switch to light mode" onClick={handleThemeChange} color="inherit">
+                  <LightModeOutlinedIcon />
                 </IconButton>
               </Tooltip>
             ) : (
-              <Tooltip title="Turn off the light">
-                <IconButton onClick={handleThemeChange} color="inherit">
-                  <LightModeOutlinedIcon />
+              <Tooltip title="Switch to dark mode">
+                <IconButton aria-label="Switch to dark mode" onClick={handleThemeChange} color="inherit">
+                  <DarkModeOutlinedIcon />
                 </IconButton>
               </Tooltip>
             )}
@@ -130,6 +127,7 @@ const App: React.FC = () => {
           {/* <GraphDataHandler /> */}
         </Container>
       </Router>
+      </ThemeModeContext.Provider>
     </ThemeProvider>
   );
 };
